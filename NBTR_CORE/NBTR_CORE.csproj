@@ -72,16 +72,13 @@
     <Reference Include="System.Core" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Base\EndianConverter.cs" />
-    <Compile Include="Base\MCRegionReader.cs" />
-    <Compile Include="Base\NBTReader.cs" />
-    <Compile Include="Base\NBTWriter.cs" />
-    <Compile Include="Info\INBTTag.cs" />
-    <Compile Include="Info\TagNodeList.cs" />
-    <Compile Include="Info\TagNodeListNamed.cs" />
-    <Compile Include="Info\TagNode.cs" />
-    <Compile Include="Info\TagNodeType.cs" />
+    <Compile Include="MCRegionFile.cs" />
+    <Compile Include="NBTFile.cs" />
+    <Compile Include="SchematicFile.cs" />
+    <Compile Include="Tag\NBT_Tag.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Utils\EndianessConverter.cs" />
+    <Compile Include="Utils\TagTypeConverter.cs" />
   </ItemGroup>
   <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
