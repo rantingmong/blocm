@@ -5,7 +5,7 @@
  *  Any part of this code is governed by the GNU General Public License version 2.
  */
 
-namespace NBT
+namespace NBT.Tag
 {
     using System;
     using System.Collections.Generic;
@@ -68,7 +68,7 @@ namespace NBT
     {
         #region FIELDS
 
-        string name;
+        string          name;
         /// <summary>
         /// The name of the tag.
         /// </summary>
@@ -77,7 +77,7 @@ namespace NBT
             get { return this.name; }
         }
 
-        TagType type;
+        TagType         type;
         /// <summary>
         /// The payload type of the tag.
         /// </summary>
@@ -86,7 +86,7 @@ namespace NBT
             get { return this.type; }
         }
 
-        dynamic payload;
+        dynamic         payload;
         /// <summary>
         /// The value of the tag.
         /// </summary>
@@ -105,7 +105,7 @@ namespace NBT
         /// <param name="name">The name (identifier) of the tag.</param>
         /// <param name="type">The payload type of the tag.</param>
         /// <param name="payload">The value of the tag. </param>
-        public NBT_Tag(string name, TagType type, dynamic payload)
+        public          NBT_Tag(string name, TagType type, dynamic payload)
         {
             this.name       = name;
             this.type       = type;
@@ -116,6 +116,10 @@ namespace NBT
 
         #region OVERRIDES
 
+        /// <summary>
+        /// Override for <see cref="ToString"/>
+        /// </summary>
+        /// <returns>A user-readable representation of this object.</returns>
         public override string ToString()
         {
             return string.Format("Tag name: {0} (value = {1})", name, payload);
