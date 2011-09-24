@@ -94,6 +94,22 @@ namespace NBT
             {
                 writer.Write(this.named ? 10 : 9);
                 writer.Write(this.nbtName);
+
+                if (this.named)
+                {
+                    foreach (KeyValuePair<string, NBT_Tag> tag in this.dict)
+                    {
+                        writer.Write((byte)tag.Value.TagType);
+                        
+                    }
+                }
+                else
+                {
+                    foreach (NBT_Tag tag in this.list)
+                    {
+
+                    }
+                }
             }
 
             return true;
@@ -299,6 +315,11 @@ namespace NBT
                 default:
                     throw new NotSupportedException("Tag type not supported!");
             }
+        }
+
+        private void            SavePayload (ref BinaryWriter writer, dynamic payload)
+        {
+
         }
     }
 }
