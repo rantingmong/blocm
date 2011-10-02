@@ -60,6 +60,55 @@ namespace NBT.Tag
         /// <param name="payload">The payload of the tag.</param>
         public                  NBTTag      (string name, byte type, dynamic payload)
         {
+            bool error = false;
+
+            switch (type)
+            {
+                case 1:
+                    if (!(payload is byte))
+                        error = true;
+                    break;
+                case 2:
+                    if (!(payload is short))
+                        error = true;
+                    break;
+                case 3:
+                    if (!(payload is int))
+                        error = true;
+                    break;
+                case 4:
+                    if (!(payload is long))
+                        error = true;
+                    break;
+                case 5:
+                    if (!(payload is float))
+                        error = true;
+                    break;
+                case 6:
+                    if (!(payload is double))
+                        error = true;
+                    break;
+                case 7:
+                    if (!(payload is byte[]))
+                        error = true;
+                    break;
+                case 8:
+                    if (!(payload is string))
+                        error = true;
+                    break;
+                case 9:
+                    if (!(payload is List<NBTTag>))
+                        error = true;
+                    break;
+                case 10:
+                    if (!(payload is Dictionary<string, NBTTag>))
+                        error = true;
+                    break;
+            }
+
+            if (error)
+                throw new InvalidCastException("Wrong type used on tag payload!");
+
             this.payload = payload;
 
             this.type = type;
