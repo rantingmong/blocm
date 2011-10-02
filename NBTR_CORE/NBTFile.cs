@@ -1,325 +1,402 @@
-﻿/*  Minecraft NBT reader
- * 
- *  Copyright 2011 Michael Ong, all rights reserved.
- *  
- *  Any part of this code is governed by the GNU General Public License version 2.
- */
+﻿using System;
+using System.Text;
+
+using System.Collections;
+using System.Collections.Generic;
+
+using System.IO;
+using System.IO.Compression;
+
+using NBT.Tag;
+using NBT.Utils;
+
 namespace NBT
 {
-    using System;
-    using System.Collections.Generic;
-
-    using System.IO;
-    using System.IO.Compression;
-
-    using System.Text;
-
-    using System.Threading;
-
-    using NBT.Tag;
-    using NBT.Utils;
-
-    public class NBTFile
+    /// <summary>
+    /// A Minecraft NBT file.
+    /// </summary>
+    public class NBTFile : IDisposable
     {
-        #region FIELDS
-
-        bool                        named       = false;
-
-        List<NBT_Tag>               list        = null;
-        Dictionary<string, NBT_Tag> dict        = null;
-
-        string                      nbtName     = "null";
+        List<NBTTag>                list;
+        Dictionary<string, NBTTag>  dict;
         /// <summary>
-        /// Obtains the name of this NBT tag.
+        /// Gets the contents of this NBT file.
         /// </summary>
-        public string               NBTName
-        {
-            get { return this.nbtName; }
-        }
-
-        /// <summary>
-        /// Obtains the total tag count of this NBT file.
-        /// </summary>
-        public int                  Count
+        public  ICollection         Contents
         {
             get
             {
                 if (named)
-                    return this.dict.Count;
+                    return dict;
                 else
-                    return this.list.Count;
+                    return list;
             }
         }
 
-        #endregion
+        bool                        named;
+        /// <summary>
+        /// Gets the list type of this NBT file. 'true' if the file is TAG_COMPOUND, 'false' for TAG_LIST.
+        /// </summary>
+        public  bool                NamedNBT
+        {
+            get { return named; }
+        }
 
-        #region CTOR
+        string                      rootname;
+        /// <summary>
+        /// Gets the root name of this NBT file.
+        /// </summary>
+        public  string              RootName
+        {
+            get { return this.rootname; }
+        }
+
+        int                         count;
+        /// <summary>
+        /// Returns the total number of elements the root list have.
+        /// </summary>
+        public  int                 CollectionCount
+        {
+            get { return this.count; }
+        }
+
 
         private                     NBTFile     ()
         {
+            list        = new List<NBTTag>();
+            dict        = new Dictionary<string, NBTTag>();
 
+            named       = false;
+            rootname    = "";
+
+            count       = 0;
+        }
+        /// <summary>
+        /// Creates a new NBT file.
+        /// </summary>
+        /// <param name="named">The list type of this NBT file, 'true' for TAG_COMPOUND, 'false' for TAG_LIST.</param>
+        /// <param name="rootname">The root name of this NBT file.</param>
+        public                      NBTFile     (bool named, string rootname)
+        {
+            this.named      = named;
+            this.rootname   = rootname;
         }
 
         /// <summary>
-        /// Creates a NBT container.
+        /// Inserts a new NBT tag in the list.
         /// </summary>
-        /// <param name="named">True for TAG_LIST, False for TAG_COMPOUND.</param>
-        public                      NBTFile     (bool named, string name)
+        /// <param name="tag">The tag to be inserted.</param>
+        public  void                InsertTag   (NBTTag tag)
         {
-            this.named = named;
-            this.nbtName = name;
+            if (named)
+                dict.Add(tag.Name, tag);
+            else
+                list.Add(tag);
+        }
+        /// <summary>
+        /// Removes a exsisting NBT tag in the list.
+        /// </summary>
+        /// <param name="tag">The tag to be removed.</param>
+        public  void                RemoveTag   (NBTTag tag)
+        {
+            if (named)
+                dict.Remove(tag.Name);
+            else
+                list.Remove(tag);
+        }
+        /// <summary>
+        /// Modifies the a NBT tag in the list.
+        /// </summary>
+        /// <param name="tag">The tag to be modified.</param>
+        /// <param name="info">The new tag to be replaced.</param>
+        public  void                ModifyTag   (NBTTag tag, NBTTag info)
+        {
+            if (named)
+                dict[tag.Name] = info;
+            else
+                list[list.IndexOf(tag)] = info;
+        }
 
-            if (!named)
+        /// <summary>
+        /// Saves this NBT file in a stream.
+        /// </summary>
+        /// <param name="stream">The output stream this NBT file will write onto.</param>
+        /// <param name="version">The compression version of the NBT, specify '1' for the original gzip compression, '2' for the mcregion zlib compression.</param>
+        public  void                SaveTag     (Stream stream, int version)
+        {
+            Stream compressStream;
+
+            if (version == 1)
             {
-                this.list = new List<NBT_Tag>();
+                compressStream = new GZipStream(stream, CompressionMode.Compress);
             }
             else
             {
-                this.dict = new Dictionary<string, NBT_Tag>();
+                stream.WriteByte(0);
+                stream.WriteByte(0);
+
+                compressStream = new DeflateStream(stream, CompressionMode.Compress);
             }
-        }
 
-        #endregion
-
-        #region Methods
-
-        /// <summary>
-        /// Writes the data currently this data has to a specified stream.
-        /// </summary>
-        /// <param name="stream">The stream to flush data on.</param>
-        /// <returns>Returns true if the operation is successful, otherwise false.</returns>
-        public  bool            Save        (Stream stream)
-        {
-            using (BinaryWriter writer = new BinaryWriter(stream))
+            BinaryWriter writer = new BinaryWriter(compressStream);
             {
-                writer.Write(this.named ? 10 : 9);
-                writer.Write(this.nbtName);
+                writer.Write((byte)(this.named ? 10 : 9)); 
+                writer.Write(EndianessConverter.ToInt16((short)this.rootname.Length));
+
+                byte[] oString = Encoding.UTF8.GetBytes(this.rootname);
+
+                for (int i = 0; i < oString.Length; i++)
+                {
+                    writer.Write(oString[i]);
+                }
 
                 if (this.named)
                 {
-                    foreach (KeyValuePair<string, NBT_Tag> tag in this.dict)
+                    foreach (KeyValuePair<string, NBTTag> tag in this.dict)
                     {
-                        writer.Write((byte)tag.Value.TagType);
-                        
+                        writer.Write(tag.Value.Type);
+                        writer.Write(EndianessConverter.ToInt16((short)tag.Value.Name.Length));
+
+                        oString = Encoding.UTF8.GetBytes(tag.Value.Name);
+
+                        for (int i = 0; i < oString.Length; i++)
+                        {
+                            writer.Write(oString[i]);
+                        }
+
+                        SavePayload(ref writer, tag.Value.Type, tag.Value.Payload);
                     }
+                    writer.Write((byte)0);
                 }
                 else
                 {
-                    foreach (NBT_Tag tag in this.list)
-                    {
+                    writer.Write(this.list[0].Type);
+                    writer.Write(EndianessConverter.ToInt32(this.list.Count));
 
+                    for (int i = 0; i < this.list.Count; i++)
+                    {
+                        SavePayload(ref writer, this.list[0].Type, this.list[i].Payload);
                     }
                 }
             }
+            writer.Close();
+            writer.Dispose();
 
-            return true;
+            writer = null;
+
+            compressStream.Close();
+            compressStream.Dispose();
+
+            compressStream = null;
         }
 
         /// <summary>
-        /// Finds a NBT tag in an unnamed list.
+        /// Opens an exsisting NBT file from a stream.
         /// </summary>
-        /// <param name="index">The index of the tag.</param>
-        /// <returns>Returns the tag given the index specified, otherwise it will return null.</returns>
-        public  NBT_Tag         FindTag     (int index)
-        {
-            if (!this.named && this.list.Count >= (index + 1))
-                return this.list[index];
-            else
-                return null;
-        }
-        /// <summary>
-        /// Finds a NBT tag in a named list.
-        /// </summary>
-        /// <param name="name">The name of the tag.</param>
-        /// <returns>Returns the tag given the name specified, otherwise it will return null.</returns>
-        public  NBT_Tag         FindTag     (string name)
-        {
-            if (this.named && this.dict.ContainsKey(name))
-                return this.dict[name];
-            else
-                return null;
-        }
-
-        /// <summary>
-        /// Inserts a NBT tag after the last item of an unnamed or named list.
-        /// </summary>
-        /// <param name="info">The NBT tag to be added.</param>
-        public  void            InsertTag   (NBT_Tag info)
-        {
-            if (this.named)
-                this.dict.Add(info.TagName, info);
-            else
-                this.list.Add(info);
-        }
-
-        /// <summary>
-        /// Removes the NBT tag at a specified index.
-        /// </summary>
-        /// <param name="index">The index of the tag to be removed.</param>
-        public  void            RemoveTag   (int index)
-        {
-            if (!this.named)
-                this.list.RemoveAt(index);
-        }
-        /// <summary>
-        /// Removes the NBT tag given a specified key.
-        /// </summary>
-        /// <param name="name">The key of the tag to be removed.</param>
-        public  void            RemoveTag   (string name)
-        {
-            if (this.named)
-                this.dict.Remove(name);
-        }
-
-        #endregion
-
-        #region STATIC METHODS
-
-        /// <summary>
-        /// Creates and opens a NBT file.
-        /// </summary>
-        /// <param name="stream">A stream where the NBT file is stored.</param>
-        /// <param name="version">Specify '1' for the original GZip compression, 2 for zlib compression.</param>
-        /// <returns>A NBT file that can be read.</returns>
-        public  static NBTFile  OpenNBT     (Stream stream, int version)
+        /// <param name="stream">The stream to get the NBT file from.</param>
+        /// <param name="version">The compression version of the NBT, specify '1' for the original gzip compression, '2' for the mcregion zlib compression.</param>
+        /// <returns>An opened NBT file.</returns>
+        public  static NBTFile      OpenFile    (Stream stream, int version)
         {
             NBTFile file = new NBTFile();
 
-            Stream compressStream = null;
+            Stream compressStream;
 
-            try
+            if (version == 1)
             {
-                // check the compression version of this NBT file 2 for zlib, 1 for gzip
-                if (version == 2)
-                {
-                    stream.ReadByte();
-                    stream.ReadByte();
+                compressStream = new GZipStream(stream, CompressionMode.Decompress);
+            }
+            else
+            {
+                stream.ReadByte();
+                stream.ReadByte();
 
-                    compressStream = new DeflateStream(stream, CompressionMode.Decompress);
+                compressStream = new DeflateStream(stream, CompressionMode.Decompress);
+            }
+
+            BinaryReader reader = new BinaryReader(compressStream);
+            {
+                Encoding textEncoding = Encoding.UTF8;
+
+                file.named      = reader.ReadByte() == 10;
+                file.rootname   = textEncoding.GetString(reader.ReadBytes(EndianessConverter.ToInt16(reader.ReadInt16())));
+
+                if (file.named)
+                {
+                    byte    type;
+                    string  name;
+
+                    while ((type = reader.ReadByte()) != 0)
+                    {
+                        name = textEncoding.GetString(reader.ReadBytes(EndianessConverter.ToInt16(reader.ReadInt16())));
+
+                        file.InsertTag(new NBTTag(name, type, file.ReadPayload(ref reader, type)));
+                    }
                 }
-                // this part is 'else'ed because i don't wany any a-hole to stupidly specify a value other than 1 or 2
                 else
                 {
-                    compressStream = new GZipStream(stream, CompressionMode.Decompress);
-                }
+                    byte    type = reader.ReadByte();
+                    int     size = EndianessConverter.ToInt32(reader.ReadInt32());
 
-                BinaryReader reader = new BinaryReader(compressStream);
-                {
-                    Encoding textEncoding = Encoding.UTF8;
-
-                    // read the initial type and name of the file
-                    file.named      = reader.ReadByte() == 10;
-                    file.nbtName    = textEncoding.GetString(reader.ReadBytes(EndianessConverter.ToInt16(reader.ReadInt16())));
-
-                    // if the file is TAG_COMPOUND
-                    if (file.named)
+                    for (int i = 0; i < size; i++)
                     {
-                        file.dict = new Dictionary<string, NBT_Tag>();
-
-                        byte    tagType;
-                        string  tagName;
-
-                        // read the children tags of this file
-                        while ((tagType = reader.ReadByte()) != 0)
-                        {
-                            tagName = textEncoding.GetString(reader.ReadBytes(EndianessConverter.ToInt16(reader.ReadInt16())));
-
-                            file.InsertTag(new NBT_Tag(tagName, (TagType)tagType, file.ReadPayload(ref reader, tagType)));
-                        }
-                    }
-                    // if the file is TAG_LIST
-                    else
-                    {
-                        file.list = new List<NBT_Tag>();
-
-                        byte    tagType = reader.ReadByte();
-                        int     tagSize = EndianessConverter.ToInt32(reader.ReadInt32());
-
-                        // read the children tags of this file
-                        for (int i = 0; i < tagSize; i++)
-                        {
-                            file.InsertTag(new NBT_Tag("", (TagType)tagType, file.ReadPayload(ref reader, tagType)));
-                        }
+                        file.InsertTag(new NBTTag("", type, file.ReadPayload(ref reader, type)));
                     }
                 }
-                reader.Close();
-                reader.Dispose();
+            }
+            reader.Close();
+            reader.Dispose();
 
-                return file;
-            }
-            catch (Exception)
-            {
-                throw;
-            }
-            finally
-            {
-                compressStream.Close();
-                compressStream.Dispose();
-            }
+            reader = null;
+
+            compressStream.Close();
+            compressStream.Dispose();
+
+            compressStream = null;
+
+            return file;
         }
 
-        #endregion
-
-        private dynamic         ReadPayload (ref BinaryReader reader, byte type)
+        private dynamic             ReadPayload (ref BinaryReader reader, byte type)
         {
             switch (type)
             {
-                case 0:     //TAG_END
-                    return null;
-                case 1:     //TAG_BYTE
+                case 0:
+                    return 0;
+                case 1:
                     return reader.ReadByte();
-                case 2:     //TAG_SHORT
+                case 2:
                     return EndianessConverter.ToInt16(reader.ReadInt16());
-                case 3:     //TAG_INT
+                case 3:
                     return EndianessConverter.ToInt32(reader.ReadInt32());
-                case 4:     //TAG_LONG
+                case 4:
                     return EndianessConverter.ToInt64(reader.ReadInt64());
-                case 5:     //TAG_FLOAT
+                case 5:
                     return EndianessConverter.ToSingle(reader.ReadSingle());
-                case 6:     //TAG_DOUBLE
+                case 6:
                     return EndianessConverter.ToDouble(reader.ReadDouble());
-                case 7:     //TAG_BYTE_ARRAY
+                case 7:
                     return reader.ReadBytes(EndianessConverter.ToInt32(reader.ReadInt32()));
-                case 8:     //TAG_STRING
+                case 8:
                     return Encoding.UTF8.GetString(reader.ReadBytes(EndianessConverter.ToInt16(reader.ReadInt16())));
-                case 9:     //TAG_LIST
+                case 9:
                     {
-                        NBT_List list = new NBT_List();
-
-                        byte    tagType = reader.ReadByte();
-                        int     tagSize = EndianessConverter.ToInt32(reader.ReadInt32());
-
-                        for (int i = 0; i < tagSize; i++)
+                        List<NBTTag> ret = new List<NBTTag>();
                         {
-                            list.Add(new NBT_Tag("", (TagType)tagType, ReadPayload(ref reader, tagType)));
-                        }
+                            byte    containerType = reader.ReadByte();
+                            int     containerSize = EndianessConverter.ToInt32(reader.ReadInt32());
 
-                        return list;
+                            for (int i = 0; i < containerSize; i++)
+                                ret.Add(new NBTTag("", containerType, ReadPayload(ref reader, containerType)));
+                        }
+                        return ret;
                     }
-                case 10:    //TAG_COMPOUND
+                case 10:
                     {
-                        NBT_Compound dict = new NBT_Compound();
-
-                        byte    tagType;
-                        string  tagName;
-
-                        while ((tagType = reader.ReadByte()) != 0)
+                        Dictionary<string, NBTTag> dic = new Dictionary<string, NBTTag>();
                         {
-                            tagName = Encoding.UTF8.GetString(reader.ReadBytes(EndianessConverter.ToInt16(reader.ReadInt16())));
+                            byte    containerType;
+                            string  containerName;
 
-                            dict.Add(tagName, new NBT_Tag(tagName, (TagType)tagType, ReadPayload(ref reader, tagType)));
+                            while ((containerType = reader.ReadByte()) != 0)
+                            {
+                                containerName = Encoding.UTF8.GetString(reader.ReadBytes(EndianessConverter.ToInt16(reader.ReadInt16())));
+
+                                dic.Add(containerName, new NBTTag(containerName, containerType, ReadPayload(ref reader, containerType)));
+                            }
                         }
-
-                        return dict;
+                        return dic;
                     }
                 default:
-                    throw new NotSupportedException("Tag type not supported!");
+                    throw new NotSupportedException("Tag type is invalid!");
+            }
+        }
+        private void                SavePayload (ref BinaryWriter writer, byte type, dynamic payload)
+        {
+            switch (type)
+            {
+                case 0:
+                    writer.Write((byte)0);
+                    break;
+                case 1:
+                    writer.Write((byte)payload);
+                    break;
+                case 2:
+                    writer.Write(EndianessConverter.ToInt16(payload));
+                    break;
+                case 3:
+                    writer.Write(EndianessConverter.ToInt32(payload));
+                    break;
+                case 4:
+                    writer.Write(EndianessConverter.ToInt64(payload));
+                    break;
+                case 5:
+                    writer.Write(EndianessConverter.ToSingle(payload));
+                    break;
+                case 6:
+                    writer.Write(EndianessConverter.ToDouble(payload));
+                    break;
+                case 7:
+                    writer.Write(EndianessConverter.ToInt32(payload.Length));
+
+                    for (int i = 0; i < payload.Length; i++)
+                    {
+                        writer.Write(payload[i]);
+                    }
+                    break;
+                case 8:
+                    writer.Write(EndianessConverter.ToInt16((short)payload.Length));
+
+                    byte[] oString = Encoding.UTF8.GetBytes(payload);
+
+                    for (int i = 0; i < oString.Length; i++)
+                    {
+                        writer.Write(oString[i]);
+                    }
+                    break;
+                case 9:
+
+                    writer.Write(payload[0].Type);
+                    writer.Write(EndianessConverter.ToInt32(payload.Count));
+
+                    foreach (NBTTag tag in payload)
+                    {
+                        SavePayload(ref writer, tag.Type, tag.Payload);
+                    }
+
+                    break;
+                case 10:
+
+                    foreach (KeyValuePair<string, NBTTag> tag in payload)
+                    {
+                        writer.Write(tag.Value.Type);
+                        writer.Write(EndianessConverter.ToInt16((short)tag.Key.Length));
+
+                        byte[] cString = Encoding.UTF8.GetBytes(tag.Key);
+
+                        for (int i = 0; i < cString.Length; i++)
+                        {
+                            writer.Write(cString[i]);
+                        }
+
+                        SavePayload(ref writer, tag.Value.Type, tag.Value.Payload);
+                    }
+                    writer.Write((byte)0);
+
+                    break;
             }
         }
 
-        private void            SavePayload (ref BinaryWriter writer, dynamic payload)
+        /// <summary>
+        /// Cleans up any resources this file used.
+        /// </summary>
+        public  void                Dispose     ()
         {
+            this.dict.Clear();
+            this.list.Clear();
 
+            this.dict = null;
+            this.list = null;
         }
     }
 }
