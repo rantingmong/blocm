@@ -79,6 +79,9 @@
     <Compile Include="Tag\NBTTag.cs" />
     <Compile Include="Tag\SCHEMATICTag.cs" />
     <Compile Include="Utils\EndianessConverter.cs" />
+    <Compile Include="Utils\MCPoint.cs" />
+    <Compile Include="Utils\MCROffset.cs" />
+    <Compile Include="Utils\MCRTStamp.cs" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="COPYRIGHT.txt" />

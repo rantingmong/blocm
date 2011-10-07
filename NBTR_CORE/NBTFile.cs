@@ -35,6 +35,8 @@ namespace NBT
     /// </summary>
     public class NBTFile : IDisposable
     {
+        ICollection                 oldContents;
+
         List<NBTTag>                list;
         Dictionary<string, NBTTag>  dict;
         /// <summary>
@@ -78,6 +80,24 @@ namespace NBT
             get { return this.count; }
         }
 
+        /// <summary>
+        /// Gets a NBT tag on a specified index (TAG_LIST only).
+        /// </summary>
+        /// <param name="index">The index of the tag.</param>
+        /// <returns>The NBTTag of that index.</returns>
+        public  NBTTag              this        [int index]
+        {
+            get { return this.list[index]; }
+        }
+        /// <summary>
+        /// Gets a NBT tag on a specified key (TAG_COMPOUND only).
+        /// </summary>
+        /// <param name="name">The key of the tag.</param>
+        /// <returns>The NBTTag of that index.</returns>
+        public  NBTTag              this        [string name]
+        {
+            get { return this.dict[name]; }
+        }
 
         private                     NBTFile     ()
         {
@@ -112,7 +132,7 @@ namespace NBT
                 list.Add(tag);
         }
         /// <summary>
-        /// Removes a exsisting NBT tag in the list.
+        /// Removes a existing NBT tag in the list.
         /// </summary>
         /// <param name="tag">The tag to be removed.</param>
         public  void                RemoveTag   (NBTTag tag)
@@ -209,7 +229,7 @@ namespace NBT
         }
 
         /// <summary>
-        /// Opens an exsisting NBT file from a stream.
+        /// Opens an existing NBT file from a stream.
         /// </summary>
         /// <param name="stream">The stream to get the NBT file from.</param>
         /// <param name="version">The compression version of the NBT, specify '1' for the original gzip compression, '2' for the mcregion zlib compression.</param>
@@ -271,6 +291,8 @@ namespace NBT
             compressStream.Dispose();
 
             compressStream = null;
+
+            file.oldContents = file.Contents;
 
             return file;
         }

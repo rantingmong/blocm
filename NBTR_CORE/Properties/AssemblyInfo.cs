@@ -5,13 +5,13 @@ using System.Runtime.InteropServices;
 // General Information about an assembly is controlled through the following 
 // set of attributes. Change these attribute values to modify the information
 // associated with an assembly.
-[assembly: AssemblyTitle("Named Binary Tag Reader/Writer")]
+[assembly: AssemblyTitle("Minecraft NBT reader")]
 [assembly: AssemblyDescription("Reads and writes NBT files")]
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("")]
 [assembly: AssemblyProduct("")]
 [assembly: AssemblyCopyright("Copyright © 2010 - 2011 Michael Ong")]
-[assembly: AssemblyTrademark("")]
+[assembly: AssemblyTrademark("Minecraft is a registered trademark of Mojang, all rights reserved.")]
 [assembly: AssemblyCulture("")]
 
 // Setting ComVisible to false makes the types in this assembly not visible 
@@ -33,4 +33,4 @@ using System.Runtime.InteropServices;
 // by using the '*' as shown below:
 // [assembly: AssemblyVersion("1.0.*")]
 [assembly: AssemblyVersion("0.5.*")]
-[assembly: AssemblyFileVersion("5.0.0.0")]
+[assembly: AssemblyFileVersion("5.5.0.0")]
