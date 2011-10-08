@@ -35,8 +35,6 @@ namespace NBT
     /// </summary>
     public class NBTFile : IDisposable
     {
-        ICollection                 oldContents;
-
         List<NBTTag>                list;
         Dictionary<string, NBTTag>  dict;
         /// <summary>
@@ -217,14 +215,10 @@ namespace NBT
                     }
                 }
             }
-            writer.Close();
             writer.Dispose();
-
-            writer = null;
-
-            compressStream.Close();
             compressStream.Dispose();
 
+            writer = null;
             compressStream = null;
         }
 
@@ -282,17 +276,11 @@ namespace NBT
                     }
                 }
             }
-            reader.Close();
             reader.Dispose();
-
-            reader = null;
-
-            compressStream.Close();
             compressStream.Dispose();
 
+            reader = null;
             compressStream = null;
-
-            file.oldContents = file.Contents;
 
             return file;
         }

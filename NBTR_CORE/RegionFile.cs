@@ -31,66 +31,65 @@ namespace NBT
 {
     public class RegionFile
     {
+        /// <summary>
+        /// The maximum threads the region reader will allocate (use 2^n values).
+        /// </summary>
+        public static readonly int  MaxTHREADS = 4;
+
         NBTFile[]                   chunks;
+        /// <summary>
+        /// The chunks of the region file.
+        /// </summary>
         public  NBTFile[]           Content
         {
             get { return this.chunks; }
         }
 
         MCROffset[]                 offsets;
-        public  MCROffset[]         Offsets
-        {
-            get { return this.offsets; }
-        }
-
         MCRTStamp[]                 tstamps;
-        public  MCRTStamp[]         TStamps
+
+        /// <summary>
+        /// Gets a chunk from this region.
+        /// </summary>
+        /// <param name="point">The location of the chunk.</param>
+        /// <returns>An NBT file that has the </returns>
+        public NBTFile              this            [MCPoint point]
         {
-            get { return this.tstamps; }
+            get
+            {
+                return this.chunks[point.X + point.Y * 32];
+            }
         }
 
-        int                         count;
-        public  int                 Count
-        {
-            get { return this.count; }
-        }
-
-        private                     RegionFile  ()
+        private                     RegionFile      ()
         {
             this.chunks     = new NBTFile[1024];
             
             this.offsets    = new MCROffset[1024];
             this.tstamps    = new MCRTStamp[1024];
-
-            this.count  = 0;
         }
 
-        public  void                InsertChunk (MCPoint location, NBTTag chunk)
+        public  void                InsertChunk     (MCPoint location, NBTFile chunk)
         {
             
         }
-        public  void                ModifyChunk (MCPoint location, NBTTag oldChunk, NBTTag newChunk)
+        public  void                ModifyChunk     (MCPoint location, NBTFile oldChunk, NBTFile newChunk)
         {
 
         }
-        public  void                RemoveChunk (MCPoint location)
-        {
-
-        }
-
-        public  void                SaveRegion  (Stream stream)
+        public  void                RemoveChunk     (MCPoint location)
         {
 
         }
 
-        public  static RegionFile   OpenRegion  (Stream stream)
+        public  void                SaveRegion      (Stream stream)
+        {
+
+        }
+
+        public  static RegionFile   OpenRegion      (Stream stream)
         {
             RegionFile region = new RegionFile();
-
-            bool c1 = false;
-            bool c2 = false;
-            bool c3 = false;
-            bool c4 = false;
 
             using (BinaryReader reader = new BinaryReader(stream))
             {
@@ -149,10 +148,7 @@ namespace NBT
                 {
                     if (tc && sc)
                     {
-                        byte[][] part1 = new byte[256][];
-                        byte[][] part2 = new byte[256][];
-                        byte[][] part3 = new byte[256][];
-                        byte[][] part4 = new byte[256][];
+                        byte[][] chunkBuffer = new byte[1024][];
 
                         for (int i = 0; i < 1024; i++)
                         {
@@ -163,125 +159,52 @@ namespace NBT
 
                             stream.Seek(offset.SectorOffset * 4096, SeekOrigin.Begin);
 
-                            int len = EndianessConverter.ToInt32(reader.ReadInt32());
-                            reader.ReadByte();
+                            int     length = EndianessConverter.ToInt32(reader.ReadInt32());
+                            byte    verson = reader.ReadByte();
 
-                            if (i < 256)
-                            {
-                                part1[i] = reader.ReadBytes(len - 1);
-                            }
-                            else if (i < 512)
-                            {
-                                part2[i - 256] = reader.ReadBytes(len - 1);
-                            }
-                            else if (i < 768)
-                            {
-                                part3[i - 512] = reader.ReadBytes(len - 1);
-                            }
-                            else
-                            {
-                                part4[i - 768] = reader.ReadBytes(len - 1);
-                            }
+                            chunkBuffer[i] = reader.ReadBytes(length - 1);
                         }
 
-                        Thread t1 = new Thread(new ThreadStart(() =>
+                        int chunkSlice = 1024 / MaxTHREADS;
+                        bool[] allOK = new bool[MaxTHREADS];
+
+                        for (int i = 0; i < MaxTHREADS; i++)
                         {
-                            for (int i = 0; i < 256; i++)
+                            byte[][] chunkWorkerBuffer = new byte[chunkSlice][];
+                            Array.Copy(chunkBuffer, i * chunkSlice, chunkWorkerBuffer, 0, chunkSlice);
+
+                            int index = i;
+
+                            Thread workerThread = new Thread(new ThreadStart(() =>
                             {
-                                if (part1[i] == null)
-                                    continue;
+                                int offset = index * (1024 / MaxTHREADS);
 
-                                MemoryStream mstream = new MemoryStream(part1[i]);
+                                for (int n = 0; n < chunkWorkerBuffer.Length; n++)
+                                {
+                                    byte[] chunk = chunkWorkerBuffer[n];
 
-                                region.chunks[i] = NBTFile.OpenFile(mstream, 2);
+                                    if (chunk == null)
+                                        continue;
 
-                                mstream.Close();
-                                mstream.Dispose();
+                                    using (MemoryStream mStream = new MemoryStream(chunk))
+                                        region.chunks[n + offset] = NBTFile.OpenFile(mStream, 2);
+                                }
 
-                                mstream = null;
+                                allOK[index] = true;
+                                chunkWorkerBuffer = null;
 
-                                part1[i] = null;
-                            }
+                                Console.WriteLine("\tThread worker " + (index + 1) + " is complete!");
+                            }));
+                            workerThread.Name = "chunk worker thread " + (index + 1);
+                            workerThread.Start();
+                        }
 
-                            c1 = true;
-                        }));
-                        t1.Name = "chunk parser worker 1";
-                        t1.Start();
+                        chunkBuffer = null;
+
+                        while (true)
+                            if (CheckIfAllOK(allOK))
+                                break;
                         
-                        Thread t2 = new Thread(new ThreadStart(() =>
-                        {
-                            for (int i = 0; i < 256; i++)
-                            {
-                                if (part2[i] == null)
-                                    continue;
-
-                                MemoryStream mstream = new MemoryStream(part2[i]);
-
-                                region.chunks[i + 256] = NBTFile.OpenFile(mstream, 2);
-
-                                mstream.Close();
-                                mstream.Dispose();
-
-                                mstream = null;
-
-                                part2[i] = null;
-                            }
-
-                            c2 = true;
-                        }));
-                        t2.Name = "chunk parser worker 2";
-                        t2.Start();
-                        
-                        Thread t3 = new Thread(new ThreadStart(() =>
-                        {
-                            for (int i = 0; i < 256; i++)
-                            {
-                                if (part3[i] == null)
-                                    continue;
-
-                                MemoryStream mstream = new MemoryStream(part3[i]);
-
-                                region.chunks[i + 512] = NBTFile.OpenFile(mstream, 2);
-
-                                mstream.Close();
-                                mstream.Dispose();
-
-                                mstream = null;
-
-                                part3[i] = null;
-                            }
-
-                            c3 = true;
-                        }));
-                        t3.Name = "chunk parser worker 3";
-                        t3.Start();
-
-                        Thread t4 = new Thread(new ThreadStart(() =>
-                        {
-                            for (int i = 0; i < 256; i++)
-                            {
-                                if (part4[i] == null)
-                                    continue;
-
-                                MemoryStream mstream = new MemoryStream(part4[i]);
-
-                                region.chunks[i + 768] = NBTFile.OpenFile(mstream, 2);
-
-                                mstream.Close();
-                                mstream.Dispose();
-
-                                mstream = null;
-
-                                part4[i] = null;
-                            }
-
-                            c4 = true;
-                        }));
-                        t4.Name = "chunk parser worker 4";
-                        t4.Start();
-
-                        while (!c1 && !c2 && !c3 && !c4) ;
-
                         break;
                     }
                 }
@@ -290,6 +213,17 @@ namespace NBT
             GC.Collect();
 
             return region;
+        }
+
+        private static bool         CheckIfAllOK    (bool[] collection)
+        {
+            for (int i = 0; i < collection.Length; i++)
+            {
+                if (!collection[i])
+                    return false;
+            }
+
+            return true;
         }
     }
 }
