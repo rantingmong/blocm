@@ -1,4 +1,4 @@
-﻿﻿/*  Minecraft NBT reader
+﻿/*  Minecraft NBT reader
  * 
  *  Copyright 2010-2011 Michael Ong, all rights reserved.
  *  
@@ -36,7 +36,7 @@ namespace NBT.Tag
         public short            X
         {
             get { return this.x; }
-        }
+		}
         public short            Z
         {
             get { return this.z; }
