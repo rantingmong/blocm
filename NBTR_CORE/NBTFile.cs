@@ -1,4 +1,4 @@
-﻿﻿/*  Minecraft NBT reader
+﻿/*  Minecraft NBT reader
  * 
  *  Copyright 2010-2011 Michael Ong, all rights reserved.
  *  
@@ -177,7 +177,7 @@ namespace NBT
             BinaryWriter writer = new BinaryWriter(compressStream);
             {
                 writer.Write((byte)(this.named ? 10 : 9)); 
-                writer.Write(EndianessConverter.ToInt16((short)this.rootname.Length));
+                writer.Write(EndiannessConverter.ToInt16((short)this.rootname.Length));
 
                 byte[] oString = Encoding.UTF8.GetBytes(this.rootname);
 
@@ -191,7 +191,7 @@ namespace NBT
                     foreach (KeyValuePair<string, NBTTag> tag in this.dict)
                     {
                         writer.Write(tag.Value.Type);
-                        writer.Write(EndianessConverter.ToInt16((short)tag.Value.Name.Length));
+                        writer.Write(EndiannessConverter.ToInt16((short)tag.Value.Name.Length));
 
                         oString = Encoding.UTF8.GetBytes(tag.Value.Name);
 
@@ -207,7 +207,7 @@ namespace NBT
                 else
                 {
                     writer.Write(this.list[0].Type);
-                    writer.Write(EndianessConverter.ToInt32(this.list.Count));
+                    writer.Write(EndiannessConverter.ToInt32(this.list.Count));
 
                     for (int i = 0; i < this.list.Count; i++)
                     {
@@ -251,7 +251,7 @@ namespace NBT
                 Encoding textEncoding = Encoding.UTF8;
 
                 file.named      = reader.ReadByte() == 10;
-                file.rootname   = textEncoding.GetString(reader.ReadBytes(EndianessConverter.ToInt16(reader.ReadInt16())));
+                file.rootname   = textEncoding.GetString(reader.ReadBytes(EndiannessConverter.ToInt16(reader.ReadInt16())));
 
                 if (file.named)
                 {
@@ -260,7 +260,7 @@ namespace NBT
 
                     while ((type = reader.ReadByte()) != 0)
                     {
-                        name = textEncoding.GetString(reader.ReadBytes(EndianessConverter.ToInt16(reader.ReadInt16())));
+                        name = textEncoding.GetString(reader.ReadBytes(EndiannessConverter.ToInt16(reader.ReadInt16())));
 
                         file.InsertTag(new NBTTag(name, type, file.ReadPayload(ref reader, type)));
                     }
@@ -268,7 +268,7 @@ namespace NBT
                 else
                 {
                     byte    type = reader.ReadByte();
-                    int     size = EndianessConverter.ToInt32(reader.ReadInt32());
+                    int     size = EndiannessConverter.ToInt32(reader.ReadInt32());
 
                     for (int i = 0; i < size; i++)
                     {
@@ -294,25 +294,25 @@ namespace NBT
                 case 1:
                     return reader.ReadByte();
                 case 2:
-                    return EndianessConverter.ToInt16(reader.ReadInt16());
+                    return EndiannessConverter.ToInt16(reader.ReadInt16());
                 case 3:
-                    return EndianessConverter.ToInt32(reader.ReadInt32());
+                    return EndiannessConverter.ToInt32(reader.ReadInt32());
                 case 4:
-                    return EndianessConverter.ToInt64(reader.ReadInt64());
+                    return EndiannessConverter.ToInt64(reader.ReadInt64());
                 case 5:
-                    return EndianessConverter.ToSingle(reader.ReadSingle());
+                    return EndiannessConverter.ToSingle(reader.ReadSingle());
                 case 6:
-                    return EndianessConverter.ToDouble(reader.ReadDouble());
+                    return EndiannessConverter.ToDouble(reader.ReadDouble());
                 case 7:
-                    return reader.ReadBytes(EndianessConverter.ToInt32(reader.ReadInt32()));
+                    return reader.ReadBytes(EndiannessConverter.ToInt32(reader.ReadInt32()));
                 case 8:
-                    return Encoding.UTF8.GetString(reader.ReadBytes(EndianessConverter.ToInt16(reader.ReadInt16())));
+                    return Encoding.UTF8.GetString(reader.ReadBytes(EndiannessConverter.ToInt16(reader.ReadInt16())));
                 case 9:
                     {
                         List<NBTTag> ret = new List<NBTTag>();
                         {
                             byte    containerType = reader.ReadByte();
-                            int     containerSize = EndianessConverter.ToInt32(reader.ReadInt32());
+                            int     containerSize = EndiannessConverter.ToInt32(reader.ReadInt32());
 
                             for (int i = 0; i < containerSize; i++)
                                 ret.Add(new NBTTag("", containerType, ReadPayload(ref reader, containerType)));
@@ -328,7 +328,7 @@ namespace NBT
 
                             while ((containerType = reader.ReadByte()) != 0)
                             {
-                                containerName = Encoding.UTF8.GetString(reader.ReadBytes(EndianessConverter.ToInt16(reader.ReadInt16())));
+                                containerName = Encoding.UTF8.GetString(reader.ReadBytes(EndiannessConverter.ToInt16(reader.ReadInt16())));
 
                                 dic.Add(containerName, new NBTTag(containerName, containerType, ReadPayload(ref reader, containerType)));
                             }
@@ -350,22 +350,22 @@ namespace NBT
                     writer.Write((byte)payload);
                     break;
                 case 2:
-                    writer.Write(EndianessConverter.ToInt16(payload));
+                    writer.Write(EndiannessConverter.ToInt16(payload));
                     break;
                 case 3:
-                    writer.Write(EndianessConverter.ToInt32(payload));
+                    writer.Write(EndiannessConverter.ToInt32(payload));
                     break;
                 case 4:
-                    writer.Write(EndianessConverter.ToInt64(payload));
+                    writer.Write(EndiannessConverter.ToInt64(payload));
                     break;
                 case 5:
-                    writer.Write(EndianessConverter.ToSingle(payload));
+                    writer.Write(EndiannessConverter.ToSingle(payload));
                     break;
                 case 6:
-                    writer.Write(EndianessConverter.ToDouble(payload));
+                    writer.Write(EndiannessConverter.ToDouble(payload));
                     break;
                 case 7:
-                    writer.Write(EndianessConverter.ToInt32(payload.Length));
+                    writer.Write(EndiannessConverter.ToInt32(payload.Length));
 
                     for (int i = 0; i < payload.Length; i++)
                     {
@@ -373,7 +373,7 @@ namespace NBT
                     }
                     break;
                 case 8:
-                    writer.Write(EndianessConverter.ToInt16((short)payload.Length));
+                    writer.Write(EndiannessConverter.ToInt16((short)payload.Length));
 
                     byte[] oString = Encoding.UTF8.GetBytes(payload);
 
@@ -385,7 +385,7 @@ namespace NBT
                 case 9:
 
                     writer.Write(payload[0].Type);
-                    writer.Write(EndianessConverter.ToInt32(payload.Count));
+                    writer.Write(EndiannessConverter.ToInt32(payload.Count));
 
                     foreach (NBTTag tag in payload)
                     {
@@ -398,7 +398,7 @@ namespace NBT
                     foreach (KeyValuePair<string, NBTTag> tag in payload)
                     {
                         writer.Write(tag.Value.Type);
-                        writer.Write(EndianessConverter.ToInt16((short)tag.Key.Length));
+                        writer.Write(EndiannessConverter.ToInt16((short)tag.Key.Length));
 
                         byte[] cString = Encoding.UTF8.GetBytes(tag.Key);
 

@@ -21,23 +21,19 @@ using System;
 namespace NBT.Utils
 {
     /// <summary>
-    /// Provides helper methods to convert between byte endianess.
+    /// Provides helper methods to convert between byte endianness.
     /// </summary>
-    public class EndianessConverter
+    public class EndiannessConverter
     {
         public static short     ToInt16     (short value)
         {
-            byte[] reverse = BitConverter.GetBytes(value);
-            Array.Reverse(reverse);
-
-            return BitConverter.ToInt16(reverse, 0);
+            return (short)((value >> 8) | ((value << 8) & 0xFF));
         }
         public static int       ToInt32     (int value)
         {
-            byte[] reverse = BitConverter.GetBytes(value);
-            Array.Reverse(reverse);
+            value = (int)((value << 8) & 0xFF00FF00) | (int)((value >> 8) & 0xFF00FF);
 
-            return BitConverter.ToInt32(reverse, 0);
+            return (value << 16) | ((value >> 16) & 0xFFFF);
         }
         public static long      ToInt64     (long value)
         {
