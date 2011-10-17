@@ -20,9 +20,15 @@ using System;
 
 namespace NBT.Utils
 {
+    /// <summary>
+    /// Indicates the location of a chunk in a region file.
+    /// </summary>
     public struct MCROffset
     {
         int             sectorOffset;
+        /// <summary>
+        /// The sector offset of the chunk.
+        /// </summary>
         public int      SectorOffset
         {
             get { return this.sectorOffset; }
@@ -30,6 +36,9 @@ namespace NBT.Utils
         }
 
         byte            sectorSize;
+        /// <summary>
+        /// The sector count of a chunk. A one sector is equal to 1024 bytes.
+        /// </summary>
         public byte     SectorSize
         {
             get { return this.sectorSize; }

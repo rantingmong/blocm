@@ -21,7 +21,7 @@ using System;
 namespace NBT.Utils
 {
     /// <summary>
-    /// Defines a chunk point in a MCRegion file.
+    /// Defines a chunk point in a region file.
     /// </summary>
     public struct MCPoint
     {

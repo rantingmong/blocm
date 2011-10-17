@@ -87,9 +87,11 @@ namespace NBT
         /// <param name="chunk">The chunk to be added.</param>
         public  void                InsertChunk     (MCPoint location, NBTFile chunk)
         {
-            this.chunks[location.X + (location.Y * 32)] = chunk;
+            int offset = location.X + (location.Y * 32);
 
-            this.chunkChanged[location.X + (location.Y * 32)] = true;
+            this.chunks[offset] = chunk;
+
+            this.chunkChanged[offset] = true;
         }
         /// <summary>
         /// Removes a chunk on a specified location.
@@ -97,10 +99,12 @@ namespace NBT
         /// <param name="location">The region location of the chunk to be removed.</param>
         public  void                RemoveChunk     (MCPoint location)
         {
-            this.chunks[location.X + (location.Y * 32)] = null;
+            int offset = location.X + (location.Y * 32);
 
-            if (this.chunks[location.X + (location.Y * 32)] != null)
-                this.chunkChanged[location.X + (location.Y * 32)] = true;
+            this.chunks[offset] = null;
+
+            if (this.chunks[offset] != null)
+                this.chunkChanged[offset] = true;
         }
 
         /// <summary>
@@ -119,7 +123,9 @@ namespace NBT
         /// <returns>The parsed region file.</returns>
         public  static RegionFile   OpenRegion      (Stream stream)
         {
+#if DEBUG
             DateTime    wStart;
+#endif
             RegionFile  region = new RegionFile();
 
             using (BinaryReader reader = new BinaryReader(stream))
