@@ -31,6 +31,6 @@ Global
 		{76FF81AF-CCFD-4BCF-842F-AD3441FB9C5F}.Release|x86.Build.0 = Release|x86
 	EndGlobalSection
 	GlobalSection(MonoDevelopProperties) = preSolution
-		StartupItem = ..\NBTR_CORE\MCNBTcore.csproj
+		StartupItem = ..\MCNBTtest\MCNBTtest.csproj
 	EndGlobalSection
 EndGlobal

@@ -25,11 +25,11 @@ namespace NBT.Utils
     /// </summary>
     public struct MCRTStamp
     {
-        int         timestamp;
+        long        timestamp;
         /// <summary>
         /// The value of the last update time.
         /// </summary>
-        public int  Timestamp
+        public long Timestamp
         {
             get { return this.timestamp; }
             set { this.timestamp = value; }

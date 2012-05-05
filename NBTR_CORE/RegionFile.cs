@@ -37,11 +37,10 @@ namespace NBT
         /// <summary>
         /// The maximum threads the region reader will allocate (use 2^n values).
         /// </summary>
-        public static int           MaxTHREADS = 4;
-
-        bool[]                      chunkChanged;
+        public static int           MaxTHREADS      = 4;
 
         NBTFile[]                   chunks;
+
         /// <summary>
         /// The chunks of the region file.
         /// </summary>
@@ -76,8 +75,6 @@ namespace NBT
             
             this.offsets        = new MCROffset [1024];
             this.tstamps        = new MCRTStamp [1024];
-
-            this.chunkChanged   = new bool      [1024];
         }
 
         /// <summary>
@@ -90,8 +87,6 @@ namespace NBT
             int offset = location.X + (location.Y * 32);
 
             this.chunks[offset] = chunk;
-
-            this.chunkChanged[offset] = true;
         }
         /// <summary>
         /// Removes a chunk on a specified location.
@@ -102,9 +97,6 @@ namespace NBT
             int offset = location.X + (location.Y * 32);
 
             this.chunks[offset] = null;
-
-            if (this.chunks[offset] != null)
-                this.chunkChanged[offset] = true;
         }
 
         /// <summary>
@@ -113,7 +105,10 @@ namespace NBT
         /// <param name="stream">The stream the region file will write to.</param>
         public  void                SaveRegion      (Stream stream)
         {
+            using (BinaryWriter writer = new BinaryWriter(stream))
+            {
 
+            }
         }
 
         /// <summary>
@@ -123,15 +118,20 @@ namespace NBT
         /// <returns>The parsed region file.</returns>
         public  static RegionFile   OpenRegion      (Stream stream)
         {
-#if DEBUG
-            DateTime    wStart;
-#endif
             RegionFile  region = new RegionFile();
 
             using (BinaryReader reader = new BinaryReader(stream))
             {
+                // initialize values
+                #region Init
+
                 int[] sectors = new int[1024];
                 int[] tstamps = new int[1024];
+
+                #endregion
+
+                // read header information
+                #region Header IO read
 
                 for (int i = 0; i < 1024; i++)
                     sectors[i] = reader.ReadInt32();
@@ -139,7 +139,12 @@ namespace NBT
                 for (int i = 0; i < 1024; i++)
                     tstamps[i] = reader.ReadInt32();
 
-                Thread offsetThread = new Thread(new ThreadStart(() =>
+                #endregion
+
+                // parse header information
+                #region Offset parse
+
+                Thread offsetCalcThread = new Thread(new ThreadStart(() =>
                 {
                     int sector = 0;
 
@@ -150,19 +155,18 @@ namespace NBT
 
                             region.offsets[i] = new MCROffset()
                             {
-                                SectorSize = (byte)(sector & 0xFF),
-                                SectorOffset = sector >> 8,
+                                SectorSize = (byte)(sector & 0xFF), // get the sector size of the chunk
+                                SectorOffset = sector >> 8,         // get the sector offset of the chunk
                             };
                         }
-
-                    sectors = null;
                 }));
-                offsetThread.Name = "offset calculator thread";
-                offsetThread.Start();
+                offsetCalcThread.Name = "offset calculator thread";
+                offsetCalcThread.Start();
 
-                offsetThread.Join();
+                #endregion
 
-                Thread tstampThread = new Thread(new ThreadStart(() =>
+                #region Timestamp parse
+                Thread tstampCalcThread = new Thread(new ThreadStart(() =>
                 {
                     int tstamp = 0;
 
@@ -173,20 +177,22 @@ namespace NBT
 
                             region.tstamps[i] = new MCRTStamp()
                             {
-                                Timestamp = tstamp,
+                                Timestamp = tstamp
                             };
                         }
-
-                    tstamps = null;
                 }));
-                tstampThread.Name = "timestamp calculator thread";
-                tstampThread.Start();
+                tstampCalcThread.Name = "timestamp calculator thread";
+                tstampCalcThread.Start();
 
-                tstampThread.Join();
+                #endregion
 
-                wStart = DateTime.Now;
+                tstampCalcThread.Join();
+                offsetCalcThread.Join();
 
-                byte[][] chunkBuffer = new byte[1024][];
+                // read chunks from disk
+                #region Chunk IO read
+
+                byte[][] chunkBuffer = new byte[sectors.Length][];
                 {
                     int         length;
                     MCROffset   offset;
@@ -195,7 +201,7 @@ namespace NBT
                     {
                         offset = region.offsets[i];
 
-                        if (offset.SectorOffset != 0)
+                        if (offset.SectorOffset > 0)
                         {
                             stream.Seek(offset.SectorOffset * 4096, SeekOrigin.Begin);
 
@@ -207,65 +213,45 @@ namespace NBT
                     }
                 }
 
+                #endregion
+
+                // parse chunk information
+                #region Parse chunks
+
                 int chunkSlice = 1024 / MaxTHREADS;
                 Thread[] workerThreads = new Thread[MaxTHREADS];
                 {
-
                     for (int i = 0; i < MaxTHREADS; i++)
                     {
-                        byte[][] chunkWorkerBuffer = new byte[chunkSlice][];
-                        Array.Copy(chunkBuffer, i * chunkSlice, chunkWorkerBuffer, 0, chunkSlice);
-
                         int index = i;
 
                         workerThreads[i] = new Thread(new ThreadStart(() =>
                         {
-#if DEBUG
-                        DateTime start = DateTime.Now;
-#endif
-
                             int offset = index * (1024 / MaxTHREADS);
 
                             MemoryStream mmStream = null;
 
-                            for (int n = 0; n < chunkWorkerBuffer.Length; n++)
+                            for (int n = offset; n < (chunkSlice + offset); n++)
                             {
-                                byte[] chunk = chunkWorkerBuffer[n];
+                                byte[] chunk = chunkBuffer[n];
 
                                 if (chunk == null)
                                     continue;
 
-                                mmStream = new MemoryStream(chunk);
-
-                                region.chunks[n + offset] = NBTFile.OpenFile(mmStream, 2);
-
-                                mmStream.Dispose();
-                                mmStream = null;
+                                using (mmStream = new MemoryStream(chunk))
+                                    region.chunks[n - offset] = NBTFile.OpenFile(mmStream, 2);
                             }
-
-                            chunkWorkerBuffer = null;
-
-#if DEBUG
-                            Console.WriteLine("Thread worker " + (index + 1) + " is complete! Took " + (int)(DateTime.Now - start).TotalMilliseconds + "ms to process.");
                         }));
-
-                        workerThreads[i].Name = "chunk worker thread " + (index + 1);
-#else
-                        }));
-#endif
                         workerThreads[i].Start();
                     }
 
                     for (int i = 0; i < workerThreads.Length; i++)
                         workerThreads[i].Join();
                 }
+
+                #endregion
             }
             
-#if DEBUG
-            Console.WriteLine("\n=====================================================================");
-            Console.WriteLine("Region Parse complete! Actual process time is " + (DateTime.Now - wStart).TotalMilliseconds + "ms.");
-#endif
-
             return region;
         }
     }
