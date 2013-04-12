@@ -1,6 +1,6 @@
 ﻿﻿/*  Minecraft NBT reader
  * 
- *  Copyright 2010-2011 Michael Ong, all rights reserved.
+ *  Copyright 2010-2013 Michael Ong, all rights reserved.
  *  
  *  This program is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU General Public License
@@ -16,44 +16,33 @@
  *  along with this program; if not, write to the Free Software
  *  Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
-using System;
 
 namespace NBT.Utils
 {
     /// <summary>
     /// Defines a chunk point in a region file.
     /// </summary>
-    public struct MCPoint
+    public struct Point
     {
-        int         x;
-        int         y;
+	    /// <summary>
+	    /// The x-location of the chunk.
+	    /// </summary>
+	    public int	X		{ get; set; }
 
-        /// <summary>
-        /// The x-location of the chunk.
-        /// </summary>
-        public int  X
-        {
-            get { return this.x; }
-            set { this.x = value; }
-        }
-        /// <summary>
-        /// The y-location of the chunk.
-        /// </summary>
-        public int  Y
-        {
-            get { return this.y; }
-            set { this.y = value; }
-        }
+	    /// <summary>
+	    /// The y-location of the chunk.
+	    /// </summary>
+	    public int	Y		{ get; set; }
 
-        /// <summary>
+	    /// <summary>
         /// Creates a new point.
         /// </summary>
         /// <param name="x">The x-location.</param>
         /// <param name="y">The y-location.</param>
-        public      MCPoint(int x, int y)
+        public		Point	(int x, int y) : this()
         {
-            this.x = x;
-            this.y = y;
+            X = x;
+            Y = y;
         }
     }
 }

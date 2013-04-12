@@ -1,6 +1,6 @@
 ﻿
-Microsoft Visual Studio Solution File, Format Version 11.00
-# Visual Studio 2010
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 2012
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MCNBTcore", "NBTR_CORE\MCNBTcore.csproj", "{76FF81AF-CCFD-4BCF-842F-AD3441FB9C5F}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MCNBTtest", "MCNBTtest\MCNBTtest.csproj", "{03F58183-EA9F-4D33-B15E-6AD8E5714285}"

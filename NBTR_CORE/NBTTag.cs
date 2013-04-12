@@ -1,6 +1,6 @@
 ﻿﻿/*  Minecraft NBT reader
  * 
- *  Copyright 2010-2011 Michael Ong, all rights reserved.
+ *  Copyright 2010-2013 Michael Ong, all rights reserved.
  *  
  *  This program is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU General Public License
@@ -24,41 +24,30 @@ namespace NBT.Tag
     /// <summary>
     /// A NBT tag, the building blocks of a NBT file.
     /// </summary>
-    public struct NBTTag
+    public struct NbtTag
     {
-        dynamic                 payload;
-        /// <summary>
-        /// The payload of this tag.
-        /// </summary>
-        public dynamic          Payload
-        {
-            get { return this.payload; }
-        }
+	    /// <summary>
+	    /// The payload of this tag.
+	    /// </summary>
+	    public			dynamic Payload		{ get; private set; }
 
-        byte                    type;
-        string                  name;
-        /// <summary>
-        /// The tag type of this tag.
-        /// </summary>
-        public byte             Type
-        {
-            get { return this.type; }
-        }
-        /// <summary>
-        /// The name of this tag.
-        /// </summary>
-        public string           Name
-        {
-            get { return this.name; }
-        }
+	    /// <summary>
+	    /// The tag type of this tag.
+	    /// </summary>
+	    public			byte	Type		{ get; private set; }
 
-        /// <summary>
+	    /// <summary>
+	    /// The name of this tag.
+	    /// </summary>
+	    public			string	Name		{ get; private set; }
+
+	    /// <summary>
         /// Creates a new NBT tag.
         /// </summary>
         /// <param name="name">The name of the tag.</param>
         /// <param name="type">The type of the tag.</param>
         /// <param name="payload">The payload of the tag.</param>
-        public                  NBTTag      (string name, byte type, dynamic payload)
+        public					NbtTag      (string name, byte type, dynamic payload) : this()
         {
             bool error = false;
 
@@ -97,11 +86,11 @@ namespace NBT.Tag
                         error = true;
                     break;
                 case 9:
-                    if (!(payload is List<NBTTag>))
+                    if (!(payload is List<NbtTag>))
                         error = true;
                     break;
                 case 10:
-                    if (!(payload is Dictionary<string, NBTTag>))
+                    if (!(payload is Dictionary<string, NbtTag>))
                         error = true;
                     break;
             }
@@ -109,23 +98,23 @@ namespace NBT.Tag
             if (error)
                 throw new InvalidCastException("Wrong type used on tag payload!");
 
-            this.payload = payload;
+            this.Payload = payload;
 
-            this.type = type;
-            this.name = name;
+            this.Type = type;
+            this.Name = name;
         }
 
         /// <summary>
         /// Converts this tag to a human readable string.
         /// </summary>
         /// <returns></returns>
-        public override string  ToString    ()
+        public override	string	ToString    ()
         {
-            string payloadValue = payload.ToString();
+            string payloadValue = Payload.ToString();
 
-            if (payload is List<NBTTag> || payload is Dictionary<string, NBTTag>)
+            if (Payload is List<NbtTag> || Payload is Dictionary<string, NbtTag>)
             {
-                if (payload is List<NBTTag>)
+                if (Payload is List<NbtTag>)
                 {
                     payloadValue = "list ";
                 }
@@ -134,10 +123,10 @@ namespace NBT.Tag
                     payloadValue = "cmpd ";
                 }
 
-                payloadValue += "items: " + payload.Count;
+                payloadValue += "items: " + Payload.Count;
             }
 
-            return string.Format("name: {0}, value: {1}", name, payloadValue);
+            return string.Format("name: {0}, value: {1}", Name, payloadValue);
         }
     }
 }

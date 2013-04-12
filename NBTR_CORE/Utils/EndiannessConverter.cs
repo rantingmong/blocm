@@ -1,6 +1,6 @@
 ﻿﻿/*  Minecraft NBT reader
  * 
- *  Copyright 2010-2011 Michael Ong, all rights reserved.
+ *  Copyright 2010-2013 Michael Ong, all rights reserved.
  *  
  *  This program is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU General Public License
@@ -23,7 +23,7 @@ namespace NBT.Utils
     /// <summary>
     /// Provides helper methods to convert between byte endianness.
     /// </summary>
-    public class EndiannessConverter
+    public static class EndiannessConverter
     {
         public static short     ToInt16     (short value)
         {

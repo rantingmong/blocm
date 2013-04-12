@@ -1,6 +1,6 @@
 ﻿﻿/*  Minecraft NBT reader
  * 
- *  Copyright 2010-2011 Michael Ong, all rights reserved.
+ *  Copyright 2010-2013 Michael Ong, all rights reserved.
  *  
  *  This program is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU General Public License
@@ -16,23 +16,22 @@
  *  along with this program; if not, write to the Free Software
  *  Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
-using System;
 
 namespace NBT.Utils
 {
     /// <summary>
-    /// Indicates the last update the chunk has made.
+    /// Indicates the location of a chunk in a region file.
     /// </summary>
-    public struct MCRTStamp
+    public struct Offset
     {
-        long        timestamp;
-        /// <summary>
-        /// The value of the last update time.
-        /// </summary>
-        public long Timestamp
-        {
-            get { return this.timestamp; }
-            set { this.timestamp = value; }
-        }
+	    /// <summary>
+	    /// The sector offset of the chunk.
+	    /// </summary>
+	    public int SectorOffset { get; set; }
+
+	    /// <summary>
+	    /// The sector count of a chunk. A one sector is equal to 1024 bytes.
+	    /// </summary>
+	    public byte SectorSize { get; set; }
     }
 }

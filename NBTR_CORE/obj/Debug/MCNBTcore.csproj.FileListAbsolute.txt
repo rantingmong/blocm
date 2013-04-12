@@ -1,0 +1,5 @@
+C:\Users\Michael\Documents\GitHub\Minecraft-NBT-reader\NBTR_CORE\bin\Debug\nbtread.dll
+C:\Users\Michael\Documents\GitHub\Minecraft-NBT-reader\NBTR_CORE\bin\Debug\nbtread.pdb
+C:\Users\Michael\Documents\GitHub\Minecraft-NBT-reader\NBTR_CORE\obj\Debug\MCNBTcore.csprojResolveAssemblyReference.cache
+C:\Users\Michael\Documents\GitHub\Minecraft-NBT-reader\NBTR_CORE\obj\Debug\nbtread.dll
+C:\Users\Michael\Documents\GitHub\Minecraft-NBT-reader\NBTR_CORE\obj\Debug\nbtread.pdb

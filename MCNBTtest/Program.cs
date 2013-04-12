@@ -11,7 +11,7 @@ namespace MCNBTtest
 {
     class Program
     {
-        static void Main(string[] args)
+        static void zeMain(string[] args)
         {
             string[] regions = Directory.GetFiles(@"D:\Minecraft\Minecraft SMP server\world_1 - Copy\region");
 
@@ -31,10 +31,12 @@ namespace MCNBTtest
             Console.ReadLine();
         }
 
-        static void main(string[] args)
+        static void Main(string[] args)
         {
-            NBTFile         nbtFile;
-            RegionFile      regionFile;
+            NbtFile         nbtFile;
+
+            RegionFile      regionFile	= null;
+	        RegionFile		anvilFile	= null;
 
             int choice = 3;
 
@@ -45,6 +47,7 @@ namespace MCNBTtest
             Console.WriteLine("\n");
             Console.WriteLine("(1) open a NBT file");
             Console.WriteLine("(2) open a MCR file");
+			Console.WriteLine("(2) open a MCA file");
             Console.WriteLine("(3) say bye bye to this application");
 
             Console.Write("\nEnter choice: ");
@@ -67,14 +70,16 @@ namespace MCNBTtest
                     switch (choice)
                     {
                         case 1:
-                            nbtFile = NBTFile.OpenFile(File.OpenRead(Directory.GetFiles(Environment.GetFolderPath(Environment.SpecialFolder.Desktop), "*.nbt")[0]), 1);
+                            nbtFile		= NbtFile.OpenFile(File.OpenRead(Directory.GetFiles(Environment.GetFolderPath(Environment.SpecialFolder.Desktop), "*.nbt")[0]), 1);
                             break;
                         case 2:
-                            regionFile = RegionFile.OpenRegion(File.OpenRead(Directory.GetFiles(Environment.GetFolderPath(Environment.SpecialFolder.Desktop), "*.mcr")[0]));
+                            regionFile	= RegionFile.OpenRegion(File.OpenRead(Directory.GetFiles(Environment.GetFolderPath(Environment.SpecialFolder.Desktop), "*.mcr")[0]));
                             break;
                         case 3:
-
+							anvilFile	= RegionFile.OpenRegion(File.OpenRead(Directory.GetFiles(Environment.GetFolderPath(Environment.SpecialFolder.Desktop), "*.mca")[0]));
                             break;
+						case 4:
+							break;
                     }
                 }
                 catch (Exception ex)

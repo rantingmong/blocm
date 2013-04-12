@@ -1,0 +1,8 @@
+C:\Users\Michael\Documents\GitHub\Minecraft-NBT-reader\MCNBTtest\bin\Debug\MCNBTtest.exe.config
+C:\Users\Michael\Documents\GitHub\Minecraft-NBT-reader\MCNBTtest\bin\Debug\MCNBTtest.exe
+C:\Users\Michael\Documents\GitHub\Minecraft-NBT-reader\MCNBTtest\bin\Debug\MCNBTtest.pdb
+C:\Users\Michael\Documents\GitHub\Minecraft-NBT-reader\MCNBTtest\bin\Debug\nbtread.dll
+C:\Users\Michael\Documents\GitHub\Minecraft-NBT-reader\MCNBTtest\bin\Debug\nbtread.pdb
+C:\Users\Michael\Documents\GitHub\Minecraft-NBT-reader\MCNBTtest\obj\Debug\MCNBTtest.csprojResolveAssemblyReference.cache
+C:\Users\Michael\Documents\GitHub\Minecraft-NBT-reader\MCNBTtest\obj\Debug\MCNBTtest.exe
+C:\Users\Michael\Documents\GitHub\Minecraft-NBT-reader\MCNBTtest\obj\Debug\MCNBTtest.pdb
