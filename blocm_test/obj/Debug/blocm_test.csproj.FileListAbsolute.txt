@@ -1,8 +1,0 @@
-C:\Users\Michael\Documents\GitHub\Minecraft-NBT-reader\blocm_test\bin\Debug\MCNBTtest.exe.config
-C:\Users\Michael\Documents\GitHub\Minecraft-NBT-reader\blocm_test\bin\Debug\MCNBTtest.exe
-C:\Users\Michael\Documents\GitHub\Minecraft-NBT-reader\blocm_test\bin\Debug\MCNBTtest.pdb
-C:\Users\Michael\Documents\GitHub\Minecraft-NBT-reader\blocm_test\bin\Debug\blocm.dll
-C:\Users\Michael\Documents\GitHub\Minecraft-NBT-reader\blocm_test\bin\Debug\blocm.pdb
-C:\Users\Michael\Documents\GitHub\Minecraft-NBT-reader\blocm_test\obj\Debug\blocm_test.csprojResolveAssemblyReference.cache
-C:\Users\Michael\Documents\GitHub\Minecraft-NBT-reader\blocm_test\obj\Debug\MCNBTtest.exe
-C:\Users\Michael\Documents\GitHub\Minecraft-NBT-reader\blocm_test\obj\Debug\MCNBTtest.pdb

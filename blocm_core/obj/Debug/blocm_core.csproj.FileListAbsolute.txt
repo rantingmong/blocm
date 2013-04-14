@@ -1,5 +1,0 @@
-C:\Users\Michael\Documents\GitHub\Minecraft-NBT-reader\blocm_core\bin\Debug\blocm.dll
-C:\Users\Michael\Documents\GitHub\Minecraft-NBT-reader\blocm_core\bin\Debug\blocm.pdb
-C:\Users\Michael\Documents\GitHub\Minecraft-NBT-reader\blocm_core\obj\Debug\blocm.dll
-C:\Users\Michael\Documents\GitHub\Minecraft-NBT-reader\blocm_core\obj\Debug\blocm.pdb
-C:\Users\Michael\Documents\GitHub\Minecraft-NBT-reader\blocm_core\obj\Debug\blocm_core.csprojResolveAssemblyReference.cache
