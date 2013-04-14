@@ -1,0 +1,10 @@
+C:\Users\Michael\Documents\GitHub\Minecraft-NBT-reader\blocm_gui\bin\Debug\blocm_gui.exe
+C:\Users\Michael\Documents\GitHub\Minecraft-NBT-reader\blocm_gui\bin\Debug\blocm_gui.pdb
+C:\Users\Michael\Documents\GitHub\Minecraft-NBT-reader\blocm_gui\bin\Debug\blocm.dll
+C:\Users\Michael\Documents\GitHub\Minecraft-NBT-reader\blocm_gui\bin\Debug\blocm.pdb
+C:\Users\Michael\Documents\GitHub\Minecraft-NBT-reader\blocm_gui\obj\Debug\blocm_gui.csprojResolveAssemblyReference.cache
+C:\Users\Michael\Documents\GitHub\Minecraft-NBT-reader\blocm_gui\obj\Debug\blocm_gui.FormMain.resources
+C:\Users\Michael\Documents\GitHub\Minecraft-NBT-reader\blocm_gui\obj\Debug\blocm_gui.Properties.Resources.resources
+C:\Users\Michael\Documents\GitHub\Minecraft-NBT-reader\blocm_gui\obj\Debug\blocm_gui.csproj.GenerateResource.Cache
+C:\Users\Michael\Documents\GitHub\Minecraft-NBT-reader\blocm_gui\obj\Debug\blocm_gui.exe
+C:\Users\Michael\Documents\GitHub\Minecraft-NBT-reader\blocm_gui\obj\Debug\blocm_gui.pdb
