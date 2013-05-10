@@ -1,4 +1,4 @@
-﻿﻿/*  Minecraft NBT reader
+﻿/*  Minecraft NBT reader
  * 
  *  Copyright 2010-2013 Michael Ong, all rights reserved.
  *  
@@ -20,18 +20,18 @@
 namespace NBT.Utils
 {
     /// <summary>
-    /// Indicates the location of a chunk in a region file.
+    ///     Indicates the location of a chunk in a region file.
     /// </summary>
     public struct Offset
     {
-	    /// <summary>
-	    /// The sector offset of the chunk.
-	    /// </summary>
-	    public int SectorOffset { get; set; }
+        /// <summary>
+        ///     The sector offset of the chunk.
+        /// </summary>
+        public int SectorOffset { get; set; }
 
-	    /// <summary>
-	    /// The sector count of a chunk. A one sector is equal to 1024 bytes.
-	    /// </summary>
-	    public byte SectorSize { get; set; }
+        /// <summary>
+        ///     The sector count of a chunk. A one sector is equal to 1024 bytes.
+        /// </summary>
+        public byte SectorSize { get; set; }
     }
 }

@@ -1,4 +1,4 @@
-﻿﻿/*  Minecraft NBT reader
+﻿/*  Minecraft NBT reader
  * 
  *  Copyright 2010-2013 Michael Ong, all rights reserved.
  *  
@@ -23,93 +23,93 @@ using System.Collections.Generic;
 namespace NBT
 {
     /// <summary>
-    /// A NBT tag, the building blocks of a NBT file.
+    ///     A NBT tag, the building blocks of a NBT file.
     /// </summary>
     public struct NbtTag
     {
-	    /// <summary>
-	    /// The payload of this tag.
-	    /// </summary>
-	    public			dynamic Payload		{ get; private set; }
-
-	    /// <summary>
-	    /// The tag type of this tag.
-	    /// </summary>
-	    public			byte	Type		{ get; private set; }
-
-	    /// <summary>
-	    /// The name of this tag.
-	    /// </summary>
-	    public			string	Name		{ get; private set; }
-
-	    /// <summary>
-        /// Creates a new NBT tag.
+        /// <summary>
+        ///     Creates a new NBT tag.
         /// </summary>
         /// <param name="name">The name of the tag.</param>
         /// <param name="type">The type of the tag.</param>
         /// <param name="payload">The payload of the tag.</param>
-        public					NbtTag      (string name, byte type, dynamic payload) : this()
+        public NbtTag(string name, byte type, dynamic payload) : this()
         {
             bool error = false;
 
             switch (type)
             {
-                case 1:
-                    if (!(payload is byte))
-                        error = true;
-                    break;
-                case 2:
-                    if (!(payload is short))
-                        error = true;
-                    break;
-                case 3:
-                    if (!(payload is int))
-                        error = true;
-                    break;
-                case 4:
-                    if (!(payload is long))
-                        error = true;
-                    break;
-                case 5:
-                    if (!(payload is float))
-                        error = true;
-                    break;
-                case 6:
-                    if (!(payload is double))
-                        error = true;
-                    break;
-                case 7:
-                    if (!(payload is byte[]))
-                        error = true;
-                    break;
-                case 8:
-                    if (!(payload is string))
-                        error = true;
-                    break;
-                case 9:
-                    if (!(payload is List<NbtTag>))
-                        error = true;
-                    break;
-                case 10:
-                    if (!(payload is Dictionary<string, NbtTag>))
-                        error = true;
-                    break;
+            case 1:
+                if (!(payload is byte))
+                    error = true;
+                break;
+            case 2:
+                if (!(payload is short))
+                    error = true;
+                break;
+            case 3:
+                if (!(payload is int))
+                    error = true;
+                break;
+            case 4:
+                if (!(payload is long))
+                    error = true;
+                break;
+            case 5:
+                if (!(payload is float))
+                    error = true;
+                break;
+            case 6:
+                if (!(payload is double))
+                    error = true;
+                break;
+            case 7:
+                if (!(payload is byte[]))
+                    error = true;
+                break;
+            case 8:
+                if (!(payload is string))
+                    error = true;
+                break;
+            case 9:
+                if (!(payload is List<NbtTag>))
+                    error = true;
+                break;
+            case 10:
+                if (!(payload is Dictionary<string, NbtTag>))
+                    error = true;
+                break;
             }
 
             if (error)
                 throw new InvalidCastException("Wrong type used on tag payload!");
 
-            this.Payload = payload;
+            Payload = payload;
 
-            this.Type = type;
-            this.Name = name;
+            Type = type;
+            Name = name;
         }
 
         /// <summary>
-        /// Converts this tag to a human readable string.
+        ///     The payload of this tag.
+        /// </summary>
+        public dynamic Payload { get; private set; }
+
+        /// <summary>
+        ///     The tag type of this tag.
+        /// </summary>
+        public byte Type { get; private set; }
+
+        /// <summary>
+        ///     The name of this tag.
+        /// </summary>
+        public string Name { get; private set; }
+
+        /// <summary>
+        ///     Converts this tag to a human readable string.
         /// </summary>
         /// <returns></returns>
-        public override	string	ToString    ()
+        public override string ToString()
         {
             string payloadValue = Payload.ToString();
 

@@ -1181,7 +1181,7 @@
             <p>[This documentation is preliminary and is subject to change.]</p><p><strong>Applies to: </strong>desktop apps | Metro style apps</p><p>Creates a bitmap that can be set as a target surface or have additional color context information specified.</p>	
             </summary>	
             <remarks>	
-            <p>If the bitmap properties are not specified, the following information is assumed: </p><ul> <li>The bitmap DPI is 96.</li> <li>The pixel format matches that of the surface.</li> <li>The returned bitmap will inherit the bind flags of the DXGI surface.<ul> <li>However, only the subset of flags meaningful to Direct2D will be inherited. For example, D3D10_USAGE_DYNAMIC is not compatible with any public Direct2D flags.</li> </ul> </li> <li>The color context is unknown.</li> </ul><p>If the bitmap properties are specified, the bitmap properties will be used as follows:</p><ul> <li>The bitmap DPI will be specified by the bitmap properties.</li> <li>If both dpiX and dpiY are 0, the bitmap DPI will be 96.</li> <li>The pixel format must be a compatible shader or render target view of the surface.</li> <li>The bitmap options must be compatible with the bind flags of the DXGI surface. However, they may be a subset. This will influence what resource views are created by the bitmap.</li> <li>The color context information will be used from the bitmap properties, if specified.</li> </ul>	
+            <p>If the bitmap properties are not specified, the following information is assumed: </p><ul> <li>The bitmap DPI is 96.</li> <li>The pixel format matches that of the surface.</li> <li>The returned bitmap will inherit the bind flags of the DXGI surface.<ul> <li>However, only the subset of flags meaningful to Direct2D will be inherited. For example, <see cref="!:SharpDX.Direct3D10.ResourceUsage.Dynamic"/> is not compatible with any public Direct2D flags.</li> </ul> </li> <li>The color context is unknown.</li> </ul><p>If the bitmap properties are specified, the bitmap properties will be used as follows:</p><ul> <li>The bitmap DPI will be specified by the bitmap properties.</li> <li>If both dpiX and dpiY are 0, the bitmap DPI will be 96.</li> <li>The pixel format must be a compatible shader or render target view of the surface.</li> <li>The bitmap options must be compatible with the bind flags of the DXGI surface. However, they may be a subset. This will influence what resource views are created by the bitmap.</li> <li>The color context information will be used from the bitmap properties, if specified.</li> </ul>	
             </remarks>	
             <!-- No matching elements were found for the following include tag --><include file=".\..\Documentation\CodeComments.xml" path="/comments/comment[@id='D2D1_BITMAP_PROPERTIES1']/*"/>	
             <msdn-id>hh404482</msdn-id>	
@@ -1353,7 +1353,7 @@
             pD2D1DeviceContext-&gt;BeginDraw();	
             pD2D1DeviceContext-&gt;DrawImage(pCommandList2);	
             pD2D1DeviceContext-&gt;EndDraw();	
-            </code>Working with Other APIs<p>Direct2D employs a simple model when interoperating with GDI and Direct3D/DXGI APIs. The command list does not record these commands. It instead rasterizes the contents in place and stores them as an <strong><see cref="T:SharpDX.Direct2D1.Bitmap"/></strong>. Because the contents are rasterized, these interop points do not maintain high fidelity.</p><p><strong>GDI:</strong> The command sink interface does not support Get/ReleaseDC() calls. When a call to <strong>ID2D1GdiInteropRenderTarget::ReleaseDC</strong> is made, Direct2D renders the contents of the updated  region into a <strong>D2D1Bitmap</strong>. This will be replayed as an aliased <strong>DrawBitmap</strong> call with a copy composite mode. 	
+            </code>Working with Other APIs<p>Direct2D employs a simple model when interoperating with GDI and Direct3D/DXGI APIs. The command list does not record these commands. It instead rasterizes the contents in place and stores them as an <strong><see cref="T:SharpDX.Direct2D1.Bitmap"/></strong>. Because the contents are rasterized, these interop points do not maintain high fidelity.</p><p><strong>GDI:</strong> The command sink interface does not support Get/ReleaseDC() calls. When a call to <strong><see cref="M:SharpDX.Direct2D1.GdiInteropRenderTarget.ReleaseDC"/></strong> is made, Direct2D renders the contents of the updated  region into a <strong>D2D1Bitmap</strong>. This will be replayed as an aliased <strong>DrawBitmap</strong> call with a copy composite mode. 	
             To rasterize the bitmap at the correct DPI, at the time of playback of the commands, whatever DPI value is set using the SetDPI() function is used. This is the only case where the <strong>sink</strong> respects the SetDPI() call.	
             </p><p><strong>DX:</strong> Direct3D cannot render directly to the command list. To render Direct3D content in this case, the application can call <strong>DrawBitmap</strong> with the <strong><see cref="T:SharpDX.Direct2D1.Bitmap"/></strong> backed by a Direct3D surface.</p>	
             </remarks>	
@@ -7003,10 +7003,6 @@
             The result of the conversion.
             </returns>
         </member>
-        <member name="F:SharpDX.Direct2D1.Effect.OpacityMetadata">
-            <summary>Constant OpacityMetadata.</summary>
-            <unmanaged>CLSID_D2D1OpacityMetadata</unmanaged>
-        </member>
         <member name="F:SharpDX.Direct2D1.Effect.DisplacementMap">
             <summary>Constant DisplacementMap.</summary>
             <unmanaged>CLSID_D2D1DisplacementMap</unmanaged>
@@ -7019,14 +7015,6 @@
             <summary>Constant Saturation.</summary>
             <unmanaged>CLSID_D2D1Saturation</unmanaged>
         </member>
-        <member name="F:SharpDX.Direct2D1.Effect.ConvolveMatrix">
-            <summary>Constant ConvolveMatrix.</summary>
-            <unmanaged>CLSID_D2D1ConvolveMatrix</unmanaged>
-        </member>
-        <member name="F:SharpDX.Direct2D1.Effect.Morphology">
-            <summary>Constant Morphology.</summary>
-            <unmanaged>CLSID_D2D1Morphology</unmanaged>
-        </member>
         <member name="F:SharpDX.Direct2D1.Effect.Histogram">
             <summary>Constant Histogram.</summary>
             <unmanaged>CLSID_D2D1Histogram</unmanaged>
@@ -7035,33 +7023,25 @@
             <summary>Constant DistantDiffuse.</summary>
             <unmanaged>CLSID_D2D1DistantDiffuse</unmanaged>
         </member>
-        <member name="F:SharpDX.Direct2D1.Effect.Scale">
-            <summary>Constant Scale.</summary>
-            <unmanaged>CLSID_D2D1Scale</unmanaged>
+        <member name="F:SharpDX.Direct2D1.Effect.GaussianBlur">
+            <summary>Constant GaussianBlur.</summary>
+            <unmanaged>CLSID_D2D1GaussianBlur</unmanaged>
+        </member>
+        <member name="F:SharpDX.Direct2D1.Effect.LinearTransfer">
+            <summary>Constant LinearTransfer.</summary>
+            <unmanaged>CLSID_D2D1LinearTransfer</unmanaged>
         </member>
         <member name="F:SharpDX.Direct2D1.Effect.Composite">
             <summary>Constant Composite.</summary>
             <unmanaged>CLSID_D2D1Composite</unmanaged>
         </member>
-        <member name="F:SharpDX.Direct2D1.Effect.Turbulence">
-            <summary>Constant Turbulence.</summary>
-            <unmanaged>CLSID_D2D1Turbulence</unmanaged>
-        </member>
-        <member name="F:SharpDX.Direct2D1.Effect.SpotDiffuse">
-            <summary>Constant SpotDiffuse.</summary>
-            <unmanaged>CLSID_D2D1SpotDiffuse</unmanaged>
-        </member>
         <member name="F:SharpDX.Direct2D1.Effect.HueRotation">
             <summary>Constant HueRotation.</summary>
             <unmanaged>CLSID_D2D1HueRotation</unmanaged>
         </member>
-        <member name="F:SharpDX.Direct2D1.Effect.ColorMatrix">
-            <summary>Constant ColorMatrix.</summary>
-            <unmanaged>CLSID_D2D1ColorMatrix</unmanaged>
-        </member>
-        <member name="F:SharpDX.Direct2D1.Effect.LuminanceToAlpha">
-            <summary>Constant LuminanceToAlpha.</summary>
-            <unmanaged>CLSID_D2D1LuminanceToAlpha</unmanaged>
+        <member name="F:SharpDX.Direct2D1.Effect.Scale">
+            <summary>Constant Scale.</summary>
+            <unmanaged>CLSID_D2D1Scale</unmanaged>
         </member>
         <member name="F:SharpDX.Direct2D1.Effect.DistantSpecular">
             <summary>Constant DistantSpecular.</summary>
@@ -7079,49 +7059,21 @@
             <summary>Constant Premultiply.</summary>
             <unmanaged>CLSID_D2D1Premultiply</unmanaged>
         </member>
-        <member name="F:SharpDX.Direct2D1.Effect.GammaTransfer">
-            <summary>Constant GammaTransfer.</summary>
-            <unmanaged>CLSID_D2D1GammaTransfer</unmanaged>
-        </member>
-        <member name="F:SharpDX.Direct2D1.Effect.Tile">
-            <summary>Constant Tile.</summary>
-            <unmanaged>CLSID_D2D1Tile</unmanaged>
-        </member>
-        <member name="F:SharpDX.Direct2D1.Effect.Blend">
-            <summary>Constant Blend.</summary>
-            <unmanaged>CLSID_D2D1Blend</unmanaged>
-        </member>
-        <member name="F:SharpDX.Direct2D1.Effect.LinearTransfer">
-            <summary>Constant LinearTransfer.</summary>
-            <unmanaged>CLSID_D2D1LinearTransfer</unmanaged>
-        </member>
-        <member name="F:SharpDX.Direct2D1.Effect.ColorManagement">
-            <summary>Constant ColorManagement.</summary>
-            <unmanaged>CLSID_D2D1ColorManagement</unmanaged>
-        </member>
-        <member name="F:SharpDX.Direct2D1.Effect.SpotSpecular">
-            <summary>Constant SpotSpecular.</summary>
-            <unmanaged>CLSID_D2D1SpotSpecular</unmanaged>
-        </member>
-        <member name="F:SharpDX.Direct2D1.Effect.Shadow">
-            <summary>Constant Shadow.</summary>
-            <unmanaged>CLSID_D2D1Shadow</unmanaged>
-        </member>
-        <member name="F:SharpDX.Direct2D1.Effect.ArithmeticComposite">
-            <summary>Constant ArithmeticComposite.</summary>
-            <unmanaged>CLSID_D2D1ArithmeticComposite</unmanaged>
+        <member name="F:SharpDX.Direct2D1.Effect.SpotDiffuse">
+            <summary>Constant SpotDiffuse.</summary>
+            <unmanaged>CLSID_D2D1SpotDiffuse</unmanaged>
         </member>
         <member name="F:SharpDX.Direct2D1.Effect.TableTransfer">
             <summary>Constant TableTransfer.</summary>
             <unmanaged>CLSID_D2D1TableTransfer</unmanaged>
         </member>
-        <member name="F:SharpDX.Direct2D1.Effect.BitmapSource">
-            <summary>Constant BitmapSource.</summary>
-            <unmanaged>CLSID_D2D1BitmapSource</unmanaged>
+        <member name="F:SharpDX.Direct2D1.Effect.Turbulence">
+            <summary>Constant Turbulence.</summary>
+            <unmanaged>CLSID_D2D1Turbulence</unmanaged>
         </member>
-        <member name="F:SharpDX.Direct2D1.Effect.PointDiffuse">
-            <summary>Constant PointDiffuse.</summary>
-            <unmanaged>CLSID_D2D1PointDiffuse</unmanaged>
+        <member name="F:SharpDX.Direct2D1.Effect.ColorManagement">
+            <summary>Constant ColorManagement.</summary>
+            <unmanaged>CLSID_D2D1ColorManagement</unmanaged>
         </member>
         <member name="F:SharpDX.Direct2D1.Effect.Crop">
             <summary>Constant Crop.</summary>
@@ -7139,21 +7091,69 @@
             <summary>Constant DiscreteTransfer.</summary>
             <unmanaged>CLSID_D2D1DiscreteTransfer</unmanaged>
         </member>
-        <member name="F:SharpDX.Direct2D1.Effect.GaussianBlur">
-            <summary>Constant GaussianBlur.</summary>
-            <unmanaged>CLSID_D2D1GaussianBlur</unmanaged>
-        </member>
         <member name="F:SharpDX.Direct2D1.Effect.PointSpecular">
             <summary>Constant PointSpecular.</summary>
             <unmanaged>CLSID_D2D1PointSpecular</unmanaged>
         </member>
-        <member name="F:SharpDX.Direct2D1.Effect.DpiCompensation">
-            <summary>Constant DpiCompensation.</summary>
-            <unmanaged>CLSID_D2D1DpiCompensation</unmanaged>
+        <member name="F:SharpDX.Direct2D1.Effect.Morphology">
+            <summary>Constant Morphology.</summary>
+            <unmanaged>CLSID_D2D1Morphology</unmanaged>
         </member>
         <member name="F:SharpDX.Direct2D1.Effect.UnPremultiply">
             <summary>Constant UnPremultiply.</summary>
             <unmanaged>CLSID_D2D1UnPremultiply</unmanaged>
+        </member>
+        <member name="F:SharpDX.Direct2D1.Effect.SpotSpecular">
+            <summary>Constant SpotSpecular.</summary>
+            <unmanaged>CLSID_D2D1SpotSpecular</unmanaged>
+        </member>
+        <member name="F:SharpDX.Direct2D1.Effect.ConvolveMatrix">
+            <summary>Constant ConvolveMatrix.</summary>
+            <unmanaged>CLSID_D2D1ConvolveMatrix</unmanaged>
+        </member>
+        <member name="F:SharpDX.Direct2D1.Effect.ArithmeticComposite">
+            <summary>Constant ArithmeticComposite.</summary>
+            <unmanaged>CLSID_D2D1ArithmeticComposite</unmanaged>
+        </member>
+        <member name="F:SharpDX.Direct2D1.Effect.GammaTransfer">
+            <summary>Constant GammaTransfer.</summary>
+            <unmanaged>CLSID_D2D1GammaTransfer</unmanaged>
+        </member>
+        <member name="F:SharpDX.Direct2D1.Effect.LuminanceToAlpha">
+            <summary>Constant LuminanceToAlpha.</summary>
+            <unmanaged>CLSID_D2D1LuminanceToAlpha</unmanaged>
+        </member>
+        <member name="F:SharpDX.Direct2D1.Effect.OpacityMetadata">
+            <summary>Constant OpacityMetadata.</summary>
+            <unmanaged>CLSID_D2D1OpacityMetadata</unmanaged>
+        </member>
+        <member name="F:SharpDX.Direct2D1.Effect.ColorMatrix">
+            <summary>Constant ColorMatrix.</summary>
+            <unmanaged>CLSID_D2D1ColorMatrix</unmanaged>
+        </member>
+        <member name="F:SharpDX.Direct2D1.Effect.Tile">
+            <summary>Constant Tile.</summary>
+            <unmanaged>CLSID_D2D1Tile</unmanaged>
+        </member>
+        <member name="F:SharpDX.Direct2D1.Effect.Blend">
+            <summary>Constant Blend.</summary>
+            <unmanaged>CLSID_D2D1Blend</unmanaged>
+        </member>
+        <member name="F:SharpDX.Direct2D1.Effect.Shadow">
+            <summary>Constant Shadow.</summary>
+            <unmanaged>CLSID_D2D1Shadow</unmanaged>
+        </member>
+        <member name="F:SharpDX.Direct2D1.Effect.BitmapSource">
+            <summary>Constant BitmapSource.</summary>
+            <unmanaged>CLSID_D2D1BitmapSource</unmanaged>
+        </member>
+        <member name="F:SharpDX.Direct2D1.Effect.PointDiffuse">
+            <summary>Constant PointDiffuse.</summary>
+            <unmanaged>CLSID_D2D1PointDiffuse</unmanaged>
+        </member>
+        <member name="F:SharpDX.Direct2D1.Effect.DpiCompensation">
+            <summary>Constant DpiCompensation.</summary>
+            <unmanaged>CLSID_D2D1DpiCompensation</unmanaged>
         </member>
         <member name="F:SharpDX.Direct2D1.Effect.AffineTransform2D">
             <summary>Constant AffineTransform2D.</summary>
@@ -8913,7 +8913,7 @@
             <param name="renderTarget"><dd>  <p>When this method returns, contains the address of the reference to the <strong><see cref="T:SharpDX.Direct2D1.RenderTarget"/></strong> object created by this method.</p> </dd></param>	
             <returns><p>If this method succeeds, it returns <strong><see cref="F:SharpDX.Result.Ok"/></strong>. Otherwise, it returns an <strong><see cref="T:SharpDX.Result"/></strong> error code.</p></returns>	
             <remarks>	
-            <p>To write to a Direct3D surface, you obtain an <see cref="T:SharpDX.DXGI.Surface"/> and pass it to the <strong>CreateDxgiSurfaceRenderTarget</strong> method to create a DXGI surface render target; you can then use the DXGI surface render target to draw 2-D content to the DXGI surface.  </p><p>A DXGI surface render target is a type of <strong><see cref="T:SharpDX.Direct2D1.RenderTarget"/></strong>. Like other Direct2D render targets, you can use it to create resources and issue drawing commands. </p><p>The DXGI surface render target and the DXGI surface must use the same DXGI format. If you specify the DXGI_FORMAT_UNKOWN format when you create the render target, it will automatically use the surface's format.</p><p>The DXGI surface render target does not perform DXGI surface synchronization. </p><p>For more information about creating and using DXGI surface render targets, see the Direct2D and Direct3D Interoperability Overview.</p><p>To work with Direct2D, the Direct3D device that provides the <see cref="T:SharpDX.DXGI.Surface"/> must be created with the <strong>D3D10_CREATE_DEVICE_BGRA_SUPPORT</strong> flag.</p><p>When you create a render target and hardware acceleration is available, you allocate resources on the computer's GPU. By creating a render target once and retaining it as long as possible, you gain performance benefits. Your application should create render targets once and hold onto them for the life of the application or until the render target's <strong>EndDraw</strong> method returns the <strong><see cref="F:SharpDX.Direct2D1.ResultCode.RecreateTarget"/></strong> error. When you receive this error, you need to recreate the render target (and any resources it created). </p><p></p>	
+            <p>To write to a Direct3D surface, you obtain an <see cref="T:SharpDX.DXGI.Surface"/> and pass it to the <strong>CreateDxgiSurfaceRenderTarget</strong> method to create a DXGI surface render target; you can then use the DXGI surface render target to draw 2-D content to the DXGI surface.  </p><p>A DXGI surface render target is a type of <strong><see cref="T:SharpDX.Direct2D1.RenderTarget"/></strong>. Like other Direct2D render targets, you can use it to create resources and issue drawing commands. </p><p>The DXGI surface render target and the DXGI surface must use the same DXGI format. If you specify the DXGI_FORMAT_UNKOWN format when you create the render target, it will automatically use the surface's format.</p><p>The DXGI surface render target does not perform DXGI surface synchronization. </p><p>For more information about creating and using DXGI surface render targets, see the Direct2D and Direct3D Interoperability Overview.</p><p>To work with Direct2D, the Direct3D device that provides the <see cref="T:SharpDX.DXGI.Surface"/> must be created with the <strong><see cref="!:SharpDX.Direct3D10.DeviceCreationFlags.BgraSupport"/></strong> flag.</p><p>When you create a render target and hardware acceleration is available, you allocate resources on the computer's GPU. By creating a render target once and retaining it as long as possible, you gain performance benefits. Your application should create render targets once and hold onto them for the life of the application or until the render target's <strong>EndDraw</strong> method returns the <strong><see cref="F:SharpDX.Direct2D1.ResultCode.RecreateTarget"/></strong> error. When you receive this error, you need to recreate the render target (and any resources it created). </p><p></p>	
             </remarks>	
             <!-- No matching elements were found for the following include tag --><include file=".\..\Documentation\CodeComments.xml" path="/comments/comment[@id='ID2D1Factory::CreateDxgiSurfaceRenderTarget']/*"/>	
             <msdn-id>dd371264</msdn-id>	
@@ -9010,7 +9010,7 @@
             <param name="d2dDevice"><dd> <p>The requested <strong><see cref="T:SharpDX.Direct2D1.Device"/></strong> object.</p> </dd></param>	
             <returns><p>The method returns an <strong><see cref="T:SharpDX.Result"/></strong>. Possible values include, but are not limited to, those in the following table.</p><p> </p><table> <tr><th><see cref="T:SharpDX.Result"/></th><th>Description</th></tr> <tr><td><see cref="F:SharpDX.Result.Ok"/></td><td>No error occurred.</td></tr> <tr><td>E_OUTOFMEMORY</td><td>Direct2D could not allocate sufficient memory to complete the call.</td></tr> <tr><td>E_INVALIDARG</td><td>An invalid parameter was passed to the returning function.</td></tr> <tr><td>D3DERR_OUTOFVIDEOMEMORY</td><td>Direct3D does not have enough display memory to perform the operation.</td></tr> </table><p>?</p></returns>	
             <remarks>	
-            <p>Each call to <strong>CreateDevice</strong> returns a unique <strong><see cref="T:SharpDX.Direct2D1.Device"/></strong> object.</p><p>The <strong><see cref="T:SharpDX.DXGI.Device"/></strong> object is obtained by calling <strong>QueryInterface</strong> on an <strong>ID3D10Device</strong> or an <strong><see cref="!:SharpDX.Direct3D11.Device"/></strong>.</p>	
+            <p>Each call to <strong>CreateDevice</strong> returns a unique <strong><see cref="T:SharpDX.Direct2D1.Device"/></strong> object.</p><p>The <strong><see cref="T:SharpDX.DXGI.Device"/></strong> object is obtained by calling <strong>QueryInterface</strong> on an <strong><see cref="!:SharpDX.Direct3D10.Device"/></strong> or an <strong><see cref="!:SharpDX.Direct3D11.Device"/></strong>.</p>	
             </remarks>	
             <!-- No matching elements were found for the following include tag --><include file=".\..\Documentation\CodeComments.xml" path="/comments/comment[@id='ID2D1Factory1::CreateDevice']/*"/>	
             <msdn-id>hh404599</msdn-id>	
@@ -9686,10 +9686,10 @@
             <remarks>	
             <p>To draw text with Direct2D,  use the <strong><see cref="M:SharpDX.Direct2D1.RenderTarget.DrawText(System.String,System.Int32,SharpDX.DirectWrite.TextFormat,SharpDX.RectangleF,SharpDX.Direct2D1.Brush,SharpDX.Direct2D1.DrawTextOptions,SharpDX.Direct2D1.MeasuringMode)"/></strong> method for text that has a single format, or the <strong><see cref="M:SharpDX.Direct2D1.RenderTarget.DrawTextLayout(SharpDX.DrawingPointF,SharpDX.DirectWrite.TextLayout,SharpDX.Direct2D1.Brush,SharpDX.Direct2D1.DrawTextOptions)"/></strong> method when you need multiple formats, advanced OpenType features, or hit testing. These methods use the DirectWrite API to provide high-quality text display.</p><p>This method doesn't return an error code if it fails. To determine whether a drawing operation (such as <strong>DrawText</strong>) failed, check the result returned by the <strong><see cref="M:SharpDX.Direct2D1.RenderTarget.EndDraw(System.Int64@,System.Int64@)"/></strong> or <strong><see cref="M:SharpDX.Direct2D1.RenderTarget.Flush(System.Int64@,System.Int64@)"/></strong> methods. </p>	
             </remarks>	
-            <!-- No matching elements were found for the following include tag --><include file=".\..\Documentation\CodeComments.xml" path="/comments/comment[@id='ID2D1RenderTarget::DrawText']/*"/>	
+            <!-- No matching elements were found for the following include tag --><include file=".\..\Documentation\CodeComments.xml" path="/comments/comment[@id='ID2D1RenderTarget::DrawTextW']/*"/>	
             <msdn-id>dd742848</msdn-id>	
-            <unmanaged>void ID2D1RenderTarget::DrawText([In, Buffer] const wchar_t* string,[In] unsigned int stringLength,[In] IDWriteTextFormat* textFormat,[In] const D2D_RECT_F* layoutRect,[In] ID2D1Brush* defaultForegroundBrush,[In] D2D1_DRAW_TEXT_OPTIONS options,[In] DWRITE_MEASURING_MODE measuringMode)</unmanaged>	
-            <unmanaged-short>ID2D1RenderTarget::DrawText</unmanaged-short>	
+            <unmanaged>void ID2D1RenderTarget::DrawTextW([In, Buffer] const wchar_t* string,[In] unsigned int stringLength,[In] IDWriteTextFormat* textFormat,[In] const D2D_RECT_F* layoutRect,[In] ID2D1Brush* defaultForegroundBrush,[In] D2D1_DRAW_TEXT_OPTIONS options,[In] DWRITE_MEASURING_MODE measuringMode)</unmanaged>	
+            <unmanaged-short>ID2D1RenderTarget::DrawTextW</unmanaged-short>	
         </member>
         <member name="M:SharpDX.Direct2D1.RenderTarget.DrawTextLayout(SharpDX.DrawingPointF,SharpDX.DirectWrite.TextLayout,SharpDX.Direct2D1.Brush,SharpDX.Direct2D1.DrawTextOptions)">
             <summary>	
@@ -10675,7 +10675,7 @@
             <param name="bitmap"><dd> <p>When this method returns, contains the address of a reference to a new bitmap object.</p> </dd></param>	
             <returns><p>The method returns an <strong><see cref="T:SharpDX.Result"/></strong>. Possible values include, but are not limited to, those in the following table.</p><table> <tr><th><see cref="T:SharpDX.Result"/></th><th>Description</th></tr> <tr><td><see cref="F:SharpDX.Result.Ok"/></td><td>No error occurred.</td></tr> <tr><td>E_OUTOFMEMORY</td><td>Direct2D could not allocate sufficient memory to complete the call.</td></tr> <tr><td>E_INVALIDARG</td><td>An invalid value was passed to the method.</td></tr> <tr><td>D3DERR_OUTOFVIDEOMEMORY</td><td>Direct3D does not have enough display memory to perform the operation.</td></tr> </table><p>?</p></returns>	
             <remarks>	
-            <p>If the bitmap properties are not specified, the following information is assumed: </p><ul> <li>The bitmap DPI is 96.</li> <li>The pixel format matches that of the surface.</li> <li>The returned bitmap will inherit the bind flags of the DXGI surface.<ul> <li>However, only the subset of flags meaningful to Direct2D will be inherited. For example, D3D10_USAGE_DYNAMIC is not compatible with any public Direct2D flags.</li> </ul> </li> <li>The color context is unknown.</li> </ul><p>If the bitmap properties are specified, the bitmap properties will be used as follows:</p><ul> <li>The bitmap DPI will be specified by the bitmap properties.</li> <li>If both dpiX and dpiY are 0, the bitmap DPI will be 96.</li> <li>The pixel format must be a compatible shader or render target view of the surface.</li> <li>The bitmap options must be compatible with the bind flags of the DXGI surface. However, they may be a subset. This will influence what resource views are created by the bitmap.</li> <li>The color context information will be used from the bitmap properties, if specified.</li> </ul>	
+            <p>If the bitmap properties are not specified, the following information is assumed: </p><ul> <li>The bitmap DPI is 96.</li> <li>The pixel format matches that of the surface.</li> <li>The returned bitmap will inherit the bind flags of the DXGI surface.<ul> <li>However, only the subset of flags meaningful to Direct2D will be inherited. For example, <see cref="!:SharpDX.Direct3D10.ResourceUsage.Dynamic"/> is not compatible with any public Direct2D flags.</li> </ul> </li> <li>The color context is unknown.</li> </ul><p>If the bitmap properties are specified, the bitmap properties will be used as follows:</p><ul> <li>The bitmap DPI will be specified by the bitmap properties.</li> <li>If both dpiX and dpiY are 0, the bitmap DPI will be 96.</li> <li>The pixel format must be a compatible shader or render target view of the surface.</li> <li>The bitmap options must be compatible with the bind flags of the DXGI surface. However, they may be a subset. This will influence what resource views are created by the bitmap.</li> <li>The color context information will be used from the bitmap properties, if specified.</li> </ul>	
             </remarks>	
             <!-- No matching elements were found for the following include tag --><include file=".\..\Documentation\CodeComments.xml" path="/comments/comment[@id='ID2D1DeviceContext::CreateBitmapFromDxgiSurface']/*"/>	
             <msdn-id>hh404482</msdn-id>	
@@ -10867,7 +10867,7 @@
             </summary>	
             <param name="image"><dd> <p>When this method returns, contains the address of a reference to the target currently associated with the device context.</p> </dd></param>	
             <remarks>	
-            <p>If a target is not associated with the device context, <em>target</em> will contain <strong><c>null</c></strong> when the methods returns.</p><p>If the currently selected target is a bitmap rather than a command list, the application can gain access to the initial bitmaps created by using one of the following methods:</p><ul> <li> <strong>CreateHwndRenderTarget</strong> </li> <li> <strong>CreateDxgiSurfaceRenderTarget</strong> </li> <li> <strong>CreateWicBitmapRenderTarget</strong> </li> <li> <strong>CreateDCRenderTarget</strong> </li> <li> <strong>CreateCompatibleRenderTarget</strong> </li> </ul><p>It is not possible for an application to destroy these bitmaps.  All of these bitmaps are bindable as bitmap targets.  However not all of these bitmaps can be used as bitmap sources for  <strong><see cref="T:SharpDX.Direct2D1.RenderTarget"/></strong> methods.</p><p> <strong>CreateDxgiSurfaceRenderTarget</strong> will create a bitmap that is usable as a bitmap source if the DXGI surface is bindable as a shader resource view.</p><p> <strong>CreateCompatibleRenderTarget</strong> will always create bitmaps that are usable as a bitmap source.</p><p> <strong><see cref="M:SharpDX.Direct2D1.RenderTarget.BeginDraw"/></strong> will copy from the <see cref="T:System.IntPtr"/> to the original bitmap associated with it.  <strong><see cref="M:SharpDX.Direct2D1.RenderTarget.EndDraw(System.Int64@,System.Int64@)"/></strong> will copy from the original bitmap to the <see cref="T:System.IntPtr"/>.  </p><p> <strong><see cref="T:SharpDX.WIC.Bitmap"/></strong> objects will be locked in the following circumstances:</p><ul> <li>BeginDraw has been called and the currently selected target bitmap is a WIC bitmap.</li> <li>A WIC bitmap is set as the target of a device context after BeginDraw has been called and before EndDraw has been called.</li> <li>Any of the ID2D1Bitmap::Copy* methods are called with a WIC bitmap as either the source or destination.</li> </ul><p><see cref="T:SharpDX.WIC.Bitmap"/> objects will be unlocked in the following circumstances:</p><ul> <li>EndDraw is called and the currently selected target bitmap is a WIC bitmap.</li> <li>A WIC bitmap is removed as the target of a device context between the calls to BeginDraw and EndDraw.</li> <li>Any of the ID2D1Bitmap::Copy* methods are called with a WIC bitmap as either the source or destination.</li> </ul><p>Direct2D will only lock bitmaps that are not currently locked.</p><p>Calling <strong>QueryInterface</strong> for <strong>ID2D1GdiInteropRenderTarget</strong> will always succeed.  <strong>ID2D1GdiInteropRenderTarget::GetDC</strong> will return a device context corresponding to the currently bound target bitmap.  GetDC will fail if the target bitmap was not created with the GDI_COMPATIBLE flag set.</p><p> <strong><see cref="M:SharpDX.Direct2D1.WindowRenderTarget.Resize(SharpDX.DrawingSize)"/></strong> will return <strong><see cref="F:SharpDX.DXGI.ResultCode.InvalidCall"/></strong> if there are any outstanding references to the original target bitmap associated with the render target.</p><p>Although the target can be a command list, it cannot be any other type of image. It cannot be the output image of an effect.</p>	
+            <p>If a target is not associated with the device context, <em>target</em> will contain <strong><c>null</c></strong> when the methods returns.</p><p>If the currently selected target is a bitmap rather than a command list, the application can gain access to the initial bitmaps created by using one of the following methods:</p><ul> <li> <strong>CreateHwndRenderTarget</strong> </li> <li> <strong>CreateDxgiSurfaceRenderTarget</strong> </li> <li> <strong>CreateWicBitmapRenderTarget</strong> </li> <li> <strong>CreateDCRenderTarget</strong> </li> <li> <strong>CreateCompatibleRenderTarget</strong> </li> </ul><p>It is not possible for an application to destroy these bitmaps.  All of these bitmaps are bindable as bitmap targets.  However not all of these bitmaps can be used as bitmap sources for  <strong><see cref="T:SharpDX.Direct2D1.RenderTarget"/></strong> methods.</p><p> <strong>CreateDxgiSurfaceRenderTarget</strong> will create a bitmap that is usable as a bitmap source if the DXGI surface is bindable as a shader resource view.</p><p> <strong>CreateCompatibleRenderTarget</strong> will always create bitmaps that are usable as a bitmap source.</p><p> <strong><see cref="M:SharpDX.Direct2D1.RenderTarget.BeginDraw"/></strong> will copy from the <see cref="T:System.IntPtr"/> to the original bitmap associated with it.  <strong><see cref="M:SharpDX.Direct2D1.RenderTarget.EndDraw(System.Int64@,System.Int64@)"/></strong> will copy from the original bitmap to the <see cref="T:System.IntPtr"/>.  </p><p> <strong><see cref="T:SharpDX.WIC.Bitmap"/></strong> objects will be locked in the following circumstances:</p><ul> <li>BeginDraw has been called and the currently selected target bitmap is a WIC bitmap.</li> <li>A WIC bitmap is set as the target of a device context after BeginDraw has been called and before EndDraw has been called.</li> <li>Any of the ID2D1Bitmap::Copy* methods are called with a WIC bitmap as either the source or destination.</li> </ul><p><see cref="T:SharpDX.WIC.Bitmap"/> objects will be unlocked in the following circumstances:</p><ul> <li>EndDraw is called and the currently selected target bitmap is a WIC bitmap.</li> <li>A WIC bitmap is removed as the target of a device context between the calls to BeginDraw and EndDraw.</li> <li>Any of the ID2D1Bitmap::Copy* methods are called with a WIC bitmap as either the source or destination.</li> </ul><p>Direct2D will only lock bitmaps that are not currently locked.</p><p>Calling <strong>QueryInterface</strong> for <strong><see cref="T:SharpDX.Direct2D1.GdiInteropRenderTarget"/></strong> will always succeed.  <strong><see cref="M:SharpDX.Direct2D1.GdiInteropRenderTarget.GetDC(SharpDX.Direct2D1.DeviceContextInitializeMode)"/></strong> will return a device context corresponding to the currently bound target bitmap.  GetDC will fail if the target bitmap was not created with the GDI_COMPATIBLE flag set.</p><p> <strong><see cref="M:SharpDX.Direct2D1.WindowRenderTarget.Resize(SharpDX.DrawingSize)"/></strong> will return <strong><see cref="F:SharpDX.DXGI.ResultCode.InvalidCall"/></strong> if there are any outstanding references to the original target bitmap associated with the render target.</p><p>Although the target can be a command list, it cannot be any other type of image. It cannot be the output image of an effect.</p>	
             </remarks>	
             <!-- No matching elements were found for the following include tag --><include file=".\..\Documentation\CodeComments.xml" path="/comments/comment[@id='ID2D1DeviceContext::GetTarget']/*"/>	
             <msdn-id>hh404523</msdn-id>	
@@ -11094,7 +11094,7 @@
             <p>[This documentation is preliminary and is subject to change.]</p><p><strong>Applies to: </strong>desktop apps | Metro style apps</p><p>Gets the target currently associated with the device context.</p>	
             </summary>	
             <remarks>	
-            <p>If a target is not associated with the device context, <em>target</em> will contain <strong><c>null</c></strong> when the methods returns.</p><p>If the currently selected target is a bitmap rather than a command list, the application can gain access to the initial bitmaps created by using one of the following methods:</p><ul> <li> <strong>CreateHwndRenderTarget</strong> </li> <li> <strong>CreateDxgiSurfaceRenderTarget</strong> </li> <li> <strong>CreateWicBitmapRenderTarget</strong> </li> <li> <strong>CreateDCRenderTarget</strong> </li> <li> <strong>CreateCompatibleRenderTarget</strong> </li> </ul><p>It is not possible for an application to destroy these bitmaps.  All of these bitmaps are bindable as bitmap targets.  However not all of these bitmaps can be used as bitmap sources for  <strong><see cref="T:SharpDX.Direct2D1.RenderTarget"/></strong> methods.</p><p> <strong>CreateDxgiSurfaceRenderTarget</strong> will create a bitmap that is usable as a bitmap source if the DXGI surface is bindable as a shader resource view.</p><p> <strong>CreateCompatibleRenderTarget</strong> will always create bitmaps that are usable as a bitmap source.</p><p> <strong><see cref="M:SharpDX.Direct2D1.RenderTarget.BeginDraw"/></strong> will copy from the <see cref="T:System.IntPtr"/> to the original bitmap associated with it.  <strong><see cref="M:SharpDX.Direct2D1.RenderTarget.EndDraw(System.Int64@,System.Int64@)"/></strong> will copy from the original bitmap to the <see cref="T:System.IntPtr"/>.  </p><p> <strong><see cref="T:SharpDX.WIC.Bitmap"/></strong> objects will be locked in the following circumstances:</p><ul> <li>BeginDraw has been called and the currently selected target bitmap is a WIC bitmap.</li> <li>A WIC bitmap is set as the target of a device context after BeginDraw has been called and before EndDraw has been called.</li> <li>Any of the ID2D1Bitmap::Copy* methods are called with a WIC bitmap as either the source or destination.</li> </ul><p><see cref="T:SharpDX.WIC.Bitmap"/> objects will be unlocked in the following circumstances:</p><ul> <li>EndDraw is called and the currently selected target bitmap is a WIC bitmap.</li> <li>A WIC bitmap is removed as the target of a device context between the calls to BeginDraw and EndDraw.</li> <li>Any of the ID2D1Bitmap::Copy* methods are called with a WIC bitmap as either the source or destination.</li> </ul><p>Direct2D will only lock bitmaps that are not currently locked.</p><p>Calling <strong>QueryInterface</strong> for <strong>ID2D1GdiInteropRenderTarget</strong> will always succeed.  <strong>ID2D1GdiInteropRenderTarget::GetDC</strong> will return a device context corresponding to the currently bound target bitmap.  GetDC will fail if the target bitmap was not created with the GDI_COMPATIBLE flag set.</p><p> <strong><see cref="M:SharpDX.Direct2D1.WindowRenderTarget.Resize(SharpDX.DrawingSize)"/></strong> will return <strong><see cref="F:SharpDX.DXGI.ResultCode.InvalidCall"/></strong> if there are any outstanding references to the original target bitmap associated with the render target.</p><p>Although the target can be a command list, it cannot be any other type of image. It cannot be the output image of an effect.</p>	
+            <p>If a target is not associated with the device context, <em>target</em> will contain <strong><c>null</c></strong> when the methods returns.</p><p>If the currently selected target is a bitmap rather than a command list, the application can gain access to the initial bitmaps created by using one of the following methods:</p><ul> <li> <strong>CreateHwndRenderTarget</strong> </li> <li> <strong>CreateDxgiSurfaceRenderTarget</strong> </li> <li> <strong>CreateWicBitmapRenderTarget</strong> </li> <li> <strong>CreateDCRenderTarget</strong> </li> <li> <strong>CreateCompatibleRenderTarget</strong> </li> </ul><p>It is not possible for an application to destroy these bitmaps.  All of these bitmaps are bindable as bitmap targets.  However not all of these bitmaps can be used as bitmap sources for  <strong><see cref="T:SharpDX.Direct2D1.RenderTarget"/></strong> methods.</p><p> <strong>CreateDxgiSurfaceRenderTarget</strong> will create a bitmap that is usable as a bitmap source if the DXGI surface is bindable as a shader resource view.</p><p> <strong>CreateCompatibleRenderTarget</strong> will always create bitmaps that are usable as a bitmap source.</p><p> <strong><see cref="M:SharpDX.Direct2D1.RenderTarget.BeginDraw"/></strong> will copy from the <see cref="T:System.IntPtr"/> to the original bitmap associated with it.  <strong><see cref="M:SharpDX.Direct2D1.RenderTarget.EndDraw(System.Int64@,System.Int64@)"/></strong> will copy from the original bitmap to the <see cref="T:System.IntPtr"/>.  </p><p> <strong><see cref="T:SharpDX.WIC.Bitmap"/></strong> objects will be locked in the following circumstances:</p><ul> <li>BeginDraw has been called and the currently selected target bitmap is a WIC bitmap.</li> <li>A WIC bitmap is set as the target of a device context after BeginDraw has been called and before EndDraw has been called.</li> <li>Any of the ID2D1Bitmap::Copy* methods are called with a WIC bitmap as either the source or destination.</li> </ul><p><see cref="T:SharpDX.WIC.Bitmap"/> objects will be unlocked in the following circumstances:</p><ul> <li>EndDraw is called and the currently selected target bitmap is a WIC bitmap.</li> <li>A WIC bitmap is removed as the target of a device context between the calls to BeginDraw and EndDraw.</li> <li>Any of the ID2D1Bitmap::Copy* methods are called with a WIC bitmap as either the source or destination.</li> </ul><p>Direct2D will only lock bitmaps that are not currently locked.</p><p>Calling <strong>QueryInterface</strong> for <strong><see cref="T:SharpDX.Direct2D1.GdiInteropRenderTarget"/></strong> will always succeed.  <strong><see cref="M:SharpDX.Direct2D1.GdiInteropRenderTarget.GetDC(SharpDX.Direct2D1.DeviceContextInitializeMode)"/></strong> will return a device context corresponding to the currently bound target bitmap.  GetDC will fail if the target bitmap was not created with the GDI_COMPATIBLE flag set.</p><p> <strong><see cref="M:SharpDX.Direct2D1.WindowRenderTarget.Resize(SharpDX.DrawingSize)"/></strong> will return <strong><see cref="F:SharpDX.DXGI.ResultCode.InvalidCall"/></strong> if there are any outstanding references to the original target bitmap associated with the render target.</p><p>Although the target can be a command list, it cannot be any other type of image. It cannot be the output image of an effect.</p>	
             </remarks>	
             <!-- No matching elements were found for the following include tag --><include file=".\..\Documentation\CodeComments.xml" path="/comments/comment[@id='ID2D1DeviceContext::GetTarget']/*"/>	
             <msdn-id>hh404523</msdn-id>	
@@ -13289,13 +13289,21 @@
             </summary>	
             <!-- No matching elements were found for the following include tag --><include file="..\..\Documentation\CodeComments.xml" path="/comments/comment[@id='SharpDX.WIC.BitmapDecoderGuids']/*"/>	
         </member>
+        <member name="F:SharpDX.WIC.BitmapDecoderGuids.Gif">
+            <summary>Constant Gif.</summary>
+            <unmanaged>CLSID_WICGifDecoder</unmanaged>
+        </member>
         <member name="F:SharpDX.WIC.BitmapDecoderGuids.Jpeg">
             <summary>Constant Jpeg.</summary>
             <unmanaged>CLSID_WICJpegDecoder</unmanaged>
         </member>
-        <member name="F:SharpDX.WIC.BitmapDecoderGuids.Ico">
-            <summary>Constant Ico.</summary>
-            <unmanaged>CLSID_WICIcoDecoder</unmanaged>
+        <member name="F:SharpDX.WIC.BitmapDecoderGuids.Png">
+            <summary>Constant Png.</summary>
+            <unmanaged>CLSID_WICPngDecoder</unmanaged>
+        </member>
+        <member name="F:SharpDX.WIC.BitmapDecoderGuids.Bmp">
+            <summary>Constant Bmp.</summary>
+            <unmanaged>CLSID_WICBmpDecoder</unmanaged>
         </member>
         <member name="F:SharpDX.WIC.BitmapDecoderGuids.Tiff">
             <summary>Constant Tiff.</summary>
@@ -13305,17 +13313,9 @@
             <summary>Constant Wmp.</summary>
             <unmanaged>CLSID_WICWmpDecoder</unmanaged>
         </member>
-        <member name="F:SharpDX.WIC.BitmapDecoderGuids.Gif">
-            <summary>Constant Gif.</summary>
-            <unmanaged>CLSID_WICGifDecoder</unmanaged>
-        </member>
-        <member name="F:SharpDX.WIC.BitmapDecoderGuids.Png">
-            <summary>Constant Png.</summary>
-            <unmanaged>CLSID_WICPngDecoder</unmanaged>
-        </member>
-        <member name="F:SharpDX.WIC.BitmapDecoderGuids.Bmp">
-            <summary>Constant Bmp.</summary>
-            <unmanaged>CLSID_WICBmpDecoder</unmanaged>
+        <member name="F:SharpDX.WIC.BitmapDecoderGuids.Ico">
+            <summary>Constant Ico.</summary>
+            <unmanaged>CLSID_WICIcoDecoder</unmanaged>
         </member>
         <member name="T:SharpDX.WIC.BitmapEncoderGuids">
             <summary>	
@@ -13327,25 +13327,25 @@
             <summary>Constant Wmp.</summary>
             <unmanaged>CLSID_WICWmpEncoder</unmanaged>
         </member>
-        <member name="F:SharpDX.WIC.BitmapEncoderGuids.Png">
-            <summary>Constant Png.</summary>
-            <unmanaged>CLSID_WICPngEncoder</unmanaged>
-        </member>
-        <member name="F:SharpDX.WIC.BitmapEncoderGuids.Tiff">
-            <summary>Constant Tiff.</summary>
-            <unmanaged>CLSID_WICTiffEncoder</unmanaged>
+        <member name="F:SharpDX.WIC.BitmapEncoderGuids.Gif">
+            <summary>Constant Gif.</summary>
+            <unmanaged>CLSID_WICGifEncoder</unmanaged>
         </member>
         <member name="F:SharpDX.WIC.BitmapEncoderGuids.Jpeg">
             <summary>Constant Jpeg.</summary>
             <unmanaged>CLSID_WICJpegEncoder</unmanaged>
         </member>
+        <member name="F:SharpDX.WIC.BitmapEncoderGuids.Png">
+            <summary>Constant Png.</summary>
+            <unmanaged>CLSID_WICPngEncoder</unmanaged>
+        </member>
         <member name="F:SharpDX.WIC.BitmapEncoderGuids.Bmp">
             <summary>Constant Bmp.</summary>
             <unmanaged>CLSID_WICBmpEncoder</unmanaged>
         </member>
-        <member name="F:SharpDX.WIC.BitmapEncoderGuids.Gif">
-            <summary>Constant Gif.</summary>
-            <unmanaged>CLSID_WICGifEncoder</unmanaged>
+        <member name="F:SharpDX.WIC.BitmapEncoderGuids.Tiff">
+            <summary>Constant Tiff.</summary>
+            <unmanaged>CLSID_WICTiffEncoder</unmanaged>
         </member>
         <member name="T:SharpDX.WIC.ContainerFormatGuids">
             <summary>	
@@ -13353,33 +13353,33 @@
             </summary>	
             <!-- No matching elements were found for the following include tag --><include file="..\..\Documentation\CodeComments.xml" path="/comments/comment[@id='SharpDX.WIC.ContainerFormatGuids']/*"/>	
         </member>
-        <member name="F:SharpDX.WIC.ContainerFormatGuids.Jpeg">
-            <summary>Constant Jpeg.</summary>
-            <unmanaged>GUID_ContainerFormatJpeg</unmanaged>
-        </member>
         <member name="F:SharpDX.WIC.ContainerFormatGuids.Ico">
             <summary>Constant Ico.</summary>
             <unmanaged>GUID_ContainerFormatIco</unmanaged>
-        </member>
-        <member name="F:SharpDX.WIC.ContainerFormatGuids.Png">
-            <summary>Constant Png.</summary>
-            <unmanaged>GUID_ContainerFormatPng</unmanaged>
-        </member>
-        <member name="F:SharpDX.WIC.ContainerFormatGuids.Wmp">
-            <summary>Constant Wmp.</summary>
-            <unmanaged>GUID_ContainerFormatWmp</unmanaged>
-        </member>
-        <member name="F:SharpDX.WIC.ContainerFormatGuids.Bmp">
-            <summary>Constant Bmp.</summary>
-            <unmanaged>GUID_ContainerFormatBmp</unmanaged>
         </member>
         <member name="F:SharpDX.WIC.ContainerFormatGuids.Gif">
             <summary>Constant Gif.</summary>
             <unmanaged>GUID_ContainerFormatGif</unmanaged>
         </member>
+        <member name="F:SharpDX.WIC.ContainerFormatGuids.Jpeg">
+            <summary>Constant Jpeg.</summary>
+            <unmanaged>GUID_ContainerFormatJpeg</unmanaged>
+        </member>
+        <member name="F:SharpDX.WIC.ContainerFormatGuids.Wmp">
+            <summary>Constant Wmp.</summary>
+            <unmanaged>GUID_ContainerFormatWmp</unmanaged>
+        </member>
         <member name="F:SharpDX.WIC.ContainerFormatGuids.Tiff">
             <summary>Constant Tiff.</summary>
             <unmanaged>GUID_ContainerFormatTiff</unmanaged>
+        </member>
+        <member name="F:SharpDX.WIC.ContainerFormatGuids.Png">
+            <summary>Constant Png.</summary>
+            <unmanaged>GUID_ContainerFormatPng</unmanaged>
+        </member>
+        <member name="F:SharpDX.WIC.ContainerFormatGuids.Bmp">
+            <summary>Constant Bmp.</summary>
+            <unmanaged>GUID_ContainerFormatBmp</unmanaged>
         </member>
         <member name="T:SharpDX.WIC.PixelFormat">
             <summary>	
@@ -13387,65 +13387,25 @@
             </summary>	
             <!-- No matching elements were found for the following include tag --><include file="..\..\Documentation\CodeComments.xml" path="/comments/comment[@id='SharpDX.WIC.PixelFormat']/*"/>	
         </member>
+        <member name="F:SharpDX.WIC.PixelFormat.Format32bppBGR101010">
+            <summary>Constant Format32bppBGR101010.</summary>
+            <unmanaged>GUID_WICPixelFormat32bppBGR101010</unmanaged>
+        </member>
         <member name="F:SharpDX.WIC.PixelFormat.Format72bpp8ChannelsAlpha">
             <summary>Constant Format72bpp8ChannelsAlpha.</summary>
             <unmanaged>GUID_WICPixelFormat72bpp8ChannelsAlpha</unmanaged>
         </member>
-        <member name="F:SharpDX.WIC.PixelFormat.Format48bppBGRFixedPoint">
-            <summary>Constant Format48bppBGRFixedPoint.</summary>
-            <unmanaged>GUID_WICPixelFormat48bppBGRFixedPoint</unmanaged>
-        </member>
-        <member name="F:SharpDX.WIC.PixelFormat.Format64bppCMYK">
-            <summary>Constant Format64bppCMYK.</summary>
-            <unmanaged>GUID_WICPixelFormat64bppCMYK</unmanaged>
-        </member>
-        <member name="F:SharpDX.WIC.PixelFormat.Format40bpp5Channels">
-            <summary>Constant Format40bpp5Channels.</summary>
-            <unmanaged>GUID_WICPixelFormat40bpp5Channels</unmanaged>
-        </member>
-        <member name="F:SharpDX.WIC.PixelFormat.Format4bppIndexed">
-            <summary>Constant Format4bppIndexed.</summary>
-            <unmanaged>GUID_WICPixelFormat4bppIndexed</unmanaged>
-        </member>
-        <member name="F:SharpDX.WIC.PixelFormat.Format40bpp4ChannelsAlpha">
-            <summary>Constant Format40bpp4ChannelsAlpha.</summary>
-            <unmanaged>GUID_WICPixelFormat40bpp4ChannelsAlpha</unmanaged>
+        <member name="F:SharpDX.WIC.PixelFormat.Format2bppIndexed">
+            <summary>Constant Format2bppIndexed.</summary>
+            <unmanaged>GUID_WICPixelFormat2bppIndexed</unmanaged>
         </member>
         <member name="F:SharpDX.WIC.PixelFormat.Format32bppGrayFixedPoint">
             <summary>Constant Format32bppGrayFixedPoint.</summary>
             <unmanaged>GUID_WICPixelFormat32bppGrayFixedPoint</unmanaged>
         </member>
-        <member name="F:SharpDX.WIC.PixelFormat.Format48bpp6Channels">
-            <summary>Constant Format48bpp6Channels.</summary>
-            <unmanaged>GUID_WICPixelFormat48bpp6Channels</unmanaged>
-        </member>
-        <member name="F:SharpDX.WIC.PixelFormat.Format32bpp3ChannelsAlpha">
-            <summary>Constant Format32bpp3ChannelsAlpha.</summary>
-            <unmanaged>GUID_WICPixelFormat32bpp3ChannelsAlpha</unmanaged>
-        </member>
-        <member name="F:SharpDX.WIC.PixelFormat.Format16bppGray">
-            <summary>Constant Format16bppGray.</summary>
-            <unmanaged>GUID_WICPixelFormat16bppGray</unmanaged>
-        </member>
         <member name="F:SharpDX.WIC.PixelFormat.Format1bppIndexed">
             <summary>Constant Format1bppIndexed.</summary>
             <unmanaged>GUID_WICPixelFormat1bppIndexed</unmanaged>
-        </member>
-        <member name="F:SharpDX.WIC.PixelFormat.Format128bpp7ChannelsAlpha">
-            <summary>Constant Format128bpp7ChannelsAlpha.</summary>
-            <unmanaged>GUID_WICPixelFormat128bpp7ChannelsAlpha</unmanaged>
-        </member>
-        <member name="F:SharpDX.WIC.PixelFormat.Format128bppRGBFixedPoint">
-            <summary>Constant Format128bppRGBFixedPoint.</summary>
-            <unmanaged>GUID_WICPixelFormat128bppRGBFixedPoint</unmanaged>
-        </member>
-        <member name="F:SharpDX.WIC.PixelFormat.Format64bppRGBAFixedPoint">
-            <summary>Constant Format64bppRGBAFixedPoint.</summary>
-            <unmanaged>GUID_WICPixelFormat64bppRGBAFixedPoint</unmanaged>
-        </member>
-        <member name="F:SharpDX.WIC.PixelFormat.Format80bpp4ChannelsAlpha">
-            <summary>Constant Format80bpp4ChannelsAlpha.</summary>
-            <unmanaged>GUID_WICPixelFormat80bpp4ChannelsAlpha</unmanaged>
         </member>
         <member name="F:SharpDX.WIC.PixelFormat.Format64bpp8Channels">
             <summary>Constant Format64bpp8Channels.</summary>
@@ -13467,133 +13427,61 @@
             <summary>Constant Format64bppRGB.</summary>
             <unmanaged>GUID_WICPixelFormat64bppRGB</unmanaged>
         </member>
-        <member name="F:SharpDX.WIC.PixelFormat.Format24bppRGB">
-            <summary>Constant Format24bppRGB.</summary>
-            <unmanaged>GUID_WICPixelFormat24bppRGB</unmanaged>
+        <member name="F:SharpDX.WIC.PixelFormat.Format112bpp7Channels">
+            <summary>Constant Format112bpp7Channels.</summary>
+            <unmanaged>GUID_WICPixelFormat112bpp7Channels</unmanaged>
         </member>
         <member name="F:SharpDX.WIC.PixelFormat.Format128bppRGBFloat">
             <summary>Constant Format128bppRGBFloat.</summary>
             <unmanaged>GUID_WICPixelFormat128bppRGBFloat</unmanaged>
         </member>
-        <member name="F:SharpDX.WIC.PixelFormat.Format32bppBGR">
-            <summary>Constant Format32bppBGR.</summary>
-            <unmanaged>GUID_WICPixelFormat32bppBGR</unmanaged>
-        </member>
-        <member name="F:SharpDX.WIC.PixelFormat.Format64bppPRGBAHalf">
-            <summary>Constant Format64bppPRGBAHalf.</summary>
-            <unmanaged>GUID_WICPixelFormat64bppPRGBAHalf</unmanaged>
-        </member>
-        <member name="F:SharpDX.WIC.PixelFormat.Format64bppRGBA">
-            <summary>Constant Format64bppRGBA.</summary>
-            <unmanaged>GUID_WICPixelFormat64bppRGBA</unmanaged>
+        <member name="F:SharpDX.WIC.PixelFormat.Format48bppRGBFixedPoint">
+            <summary>Constant Format48bppRGBFixedPoint.</summary>
+            <unmanaged>GUID_WICPixelFormat48bppRGBFixedPoint</unmanaged>
         </member>
         <member name="F:SharpDX.WIC.PixelFormat.FormatDontCare">
             <summary>Constant FormatDontCare.</summary>
             <unmanaged>GUID_WICPixelFormatDontCare</unmanaged>
         </member>
+        <member name="F:SharpDX.WIC.PixelFormat.Format128bpp7ChannelsAlpha">
+            <summary>Constant Format128bpp7ChannelsAlpha.</summary>
+            <unmanaged>GUID_WICPixelFormat128bpp7ChannelsAlpha</unmanaged>
+        </member>
+        <member name="F:SharpDX.WIC.PixelFormat.Format48bppBGRFixedPoint">
+            <summary>Constant Format48bppBGRFixedPoint.</summary>
+            <unmanaged>GUID_WICPixelFormat48bppBGRFixedPoint</unmanaged>
+        </member>
+        <member name="F:SharpDX.WIC.PixelFormat.Format24bppRGB">
+            <summary>Constant Format24bppRGB.</summary>
+            <unmanaged>GUID_WICPixelFormat24bppRGB</unmanaged>
+        </member>
         <member name="F:SharpDX.WIC.PixelFormat.Format96bppRGBFloat">
             <summary>Constant Format96bppRGBFloat.</summary>
             <unmanaged>GUID_WICPixelFormat96bppRGBFloat</unmanaged>
-        </member>
-        <member name="F:SharpDX.WIC.PixelFormat.Format32bppPRGBA">
-            <summary>Constant Format32bppPRGBA.</summary>
-            <unmanaged>GUID_WICPixelFormat32bppPRGBA</unmanaged>
-        </member>
-        <member name="F:SharpDX.WIC.PixelFormat.Format32bppCMYK">
-            <summary>Constant Format32bppCMYK.</summary>
-            <unmanaged>GUID_WICPixelFormat32bppCMYK</unmanaged>
         </member>
         <member name="F:SharpDX.WIC.PixelFormat.Format24bpp3Channels">
             <summary>Constant Format24bpp3Channels.</summary>
             <unmanaged>GUID_WICPixelFormat24bpp3Channels</unmanaged>
         </member>
-        <member name="F:SharpDX.WIC.PixelFormat.Format32bppRGBE">
-            <summary>Constant Format32bppRGBE.</summary>
-            <unmanaged>GUID_WICPixelFormat32bppRGBE</unmanaged>
-        </member>
-        <member name="F:SharpDX.WIC.PixelFormat.Format96bppRGBFixedPoint">
-            <summary>Constant Format96bppRGBFixedPoint.</summary>
-            <unmanaged>GUID_WICPixelFormat96bppRGBFixedPoint</unmanaged>
-        </member>
-        <member name="F:SharpDX.WIC.PixelFormat.Format144bpp8ChannelsAlpha">
-            <summary>Constant Format144bpp8ChannelsAlpha.</summary>
-            <unmanaged>GUID_WICPixelFormat144bpp8ChannelsAlpha</unmanaged>
-        </member>
-        <member name="F:SharpDX.WIC.PixelFormat.Format64bppBGRAFixedPoint">
-            <summary>Constant Format64bppBGRAFixedPoint.</summary>
-            <unmanaged>GUID_WICPixelFormat64bppBGRAFixedPoint</unmanaged>
-        </member>
-        <member name="F:SharpDX.WIC.PixelFormat.Format32bppGrayFloat">
-            <summary>Constant Format32bppGrayFloat.</summary>
-            <unmanaged>GUID_WICPixelFormat32bppGrayFloat</unmanaged>
+        <member name="F:SharpDX.WIC.PixelFormat.Format32bppBGR">
+            <summary>Constant Format32bppBGR.</summary>
+            <unmanaged>GUID_WICPixelFormat32bppBGR</unmanaged>
         </member>
         <member name="F:SharpDX.WIC.PixelFormat.Format64bppBGRA">
             <summary>Constant Format64bppBGRA.</summary>
             <unmanaged>GUID_WICPixelFormat64bppBGRA</unmanaged>
         </member>
-        <member name="F:SharpDX.WIC.PixelFormat.Format48bpp3Channels">
-            <summary>Constant Format48bpp3Channels.</summary>
-            <unmanaged>GUID_WICPixelFormat48bpp3Channels</unmanaged>
-        </member>
-        <member name="F:SharpDX.WIC.PixelFormat.Format48bppBGR">
-            <summary>Constant Format48bppBGR.</summary>
-            <unmanaged>GUID_WICPixelFormat48bppBGR</unmanaged>
-        </member>
-        <member name="F:SharpDX.WIC.PixelFormat.Format32bppBGR101010">
-            <summary>Constant Format32bppBGR101010.</summary>
-            <unmanaged>GUID_WICPixelFormat32bppBGR101010</unmanaged>
-        </member>
-        <member name="F:SharpDX.WIC.PixelFormat.Format112bpp7Channels">
-            <summary>Constant Format112bpp7Channels.</summary>
-            <unmanaged>GUID_WICPixelFormat112bpp7Channels</unmanaged>
-        </member>
-        <member name="F:SharpDX.WIC.PixelFormat.Format64bpp3ChannelsAlpha">
-            <summary>Constant Format64bpp3ChannelsAlpha.</summary>
-            <unmanaged>GUID_WICPixelFormat64bpp3ChannelsAlpha</unmanaged>
-        </member>
-        <member name="F:SharpDX.WIC.PixelFormat.Format2bppGray">
-            <summary>Constant Format2bppGray.</summary>
-            <unmanaged>GUID_WICPixelFormat2bppGray</unmanaged>
-        </member>
-        <member name="F:SharpDX.WIC.PixelFormat.Format56bpp7Channels">
-            <summary>Constant Format56bpp7Channels.</summary>
-            <unmanaged>GUID_WICPixelFormat56bpp7Channels</unmanaged>
-        </member>
-        <member name="F:SharpDX.WIC.PixelFormat.Format16bppBGRA5551">
-            <summary>Constant Format16bppBGRA5551.</summary>
-            <unmanaged>GUID_WICPixelFormat16bppBGRA5551</unmanaged>
-        </member>
-        <member name="F:SharpDX.WIC.PixelFormat.Format48bppRGBFixedPoint">
-            <summary>Constant Format48bppRGBFixedPoint.</summary>
-            <unmanaged>GUID_WICPixelFormat48bppRGBFixedPoint</unmanaged>
-        </member>
-        <member name="F:SharpDX.WIC.PixelFormat.Format32bppRGBA1010102">
-            <summary>Constant Format32bppRGBA1010102.</summary>
-            <unmanaged>GUID_WICPixelFormat32bppRGBA1010102</unmanaged>
-        </member>
-        <member name="F:SharpDX.WIC.PixelFormat.Format4bppGray">
-            <summary>Constant Format4bppGray.</summary>
-            <unmanaged>GUID_WICPixelFormat4bppGray</unmanaged>
-        </member>
-        <member name="F:SharpDX.WIC.PixelFormat.Format64bppPBGRA">
-            <summary>Constant Format64bppPBGRA.</summary>
-            <unmanaged>GUID_WICPixelFormat64bppPBGRA</unmanaged>
-        </member>
         <member name="F:SharpDX.WIC.PixelFormat.Format96bpp6Channels">
             <summary>Constant Format96bpp6Channels.</summary>
             <unmanaged>GUID_WICPixelFormat96bpp6Channels</unmanaged>
         </member>
-        <member name="F:SharpDX.WIC.PixelFormat.Format96bpp5ChannelsAlpha">
-            <summary>Constant Format96bpp5ChannelsAlpha.</summary>
-            <unmanaged>GUID_WICPixelFormat96bpp5ChannelsAlpha</unmanaged>
-        </member>
-        <member name="F:SharpDX.WIC.PixelFormat.Format48bppRGB">
-            <summary>Constant Format48bppRGB.</summary>
-            <unmanaged>GUID_WICPixelFormat48bppRGB</unmanaged>
-        </member>
         <member name="F:SharpDX.WIC.PixelFormat.FormatBlackWhite">
             <summary>Constant FormatBlackWhite.</summary>
             <unmanaged>GUID_WICPixelFormatBlackWhite</unmanaged>
+        </member>
+        <member name="F:SharpDX.WIC.PixelFormat.Format112bpp6ChannelsAlpha">
+            <summary>Constant Format112bpp6ChannelsAlpha.</summary>
+            <unmanaged>GUID_WICPixelFormat112bpp6ChannelsAlpha</unmanaged>
         </member>
         <member name="F:SharpDX.WIC.PixelFormat.Format32bppPBGRA">
             <summary>Constant Format32bppPBGRA.</summary>
@@ -13603,29 +13491,17 @@
             <summary>Constant Format48bppRGBHalf.</summary>
             <unmanaged>GUID_WICPixelFormat48bppRGBHalf</unmanaged>
         </member>
-        <member name="F:SharpDX.WIC.PixelFormat.Format64bppRGBFixedPoint">
-            <summary>Constant Format64bppRGBFixedPoint.</summary>
-            <unmanaged>GUID_WICPixelFormat64bppRGBFixedPoint</unmanaged>
+        <member name="F:SharpDX.WIC.PixelFormat.Format96bpp5ChannelsAlpha">
+            <summary>Constant Format96bpp5ChannelsAlpha.</summary>
+            <unmanaged>GUID_WICPixelFormat96bpp5ChannelsAlpha</unmanaged>
         </member>
-        <member name="F:SharpDX.WIC.PixelFormat.Format48bpp5ChannelsAlpha">
-            <summary>Constant Format48bpp5ChannelsAlpha.</summary>
-            <unmanaged>GUID_WICPixelFormat48bpp5ChannelsAlpha</unmanaged>
+        <member name="F:SharpDX.WIC.PixelFormat.Format80bppCMYKAlpha">
+            <summary>Constant Format80bppCMYKAlpha.</summary>
+            <unmanaged>GUID_WICPixelFormat80bppCMYKAlpha</unmanaged>
         </member>
-        <member name="F:SharpDX.WIC.PixelFormat.Format8bppGray">
-            <summary>Constant Format8bppGray.</summary>
-            <unmanaged>GUID_WICPixelFormat8bppGray</unmanaged>
-        </member>
-        <member name="F:SharpDX.WIC.PixelFormat.Format8bppIndexed">
-            <summary>Constant Format8bppIndexed.</summary>
-            <unmanaged>GUID_WICPixelFormat8bppIndexed</unmanaged>
-        </member>
-        <member name="F:SharpDX.WIC.PixelFormat.Format80bpp5Channels">
-            <summary>Constant Format80bpp5Channels.</summary>
-            <unmanaged>GUID_WICPixelFormat80bpp5Channels</unmanaged>
-        </member>
-        <member name="F:SharpDX.WIC.PixelFormat.Format64bppPRGBA">
-            <summary>Constant Format64bppPRGBA.</summary>
-            <unmanaged>GUID_WICPixelFormat64bppPRGBA</unmanaged>
+        <member name="F:SharpDX.WIC.PixelFormat.Format40bppCMYKAlpha">
+            <summary>Constant Format40bppCMYKAlpha.</summary>
+            <unmanaged>GUID_WICPixelFormat40bppCMYKAlpha</unmanaged>
         </member>
         <member name="F:SharpDX.WIC.PixelFormat.Format16bppGrayFixedPoint">
             <summary>Constant Format16bppGrayFixedPoint.</summary>
@@ -13635,49 +13511,181 @@
             <summary>Constant Format128bpp8Channels.</summary>
             <unmanaged>GUID_WICPixelFormat128bpp8Channels</unmanaged>
         </member>
-        <member name="F:SharpDX.WIC.PixelFormat.Format80bppCMYKAlpha">
-            <summary>Constant Format80bppCMYKAlpha.</summary>
-            <unmanaged>GUID_WICPixelFormat80bppCMYKAlpha</unmanaged>
+        <member name="F:SharpDX.WIC.PixelFormat.Format64bppRGBAFixedPoint">
+            <summary>Constant Format64bppRGBAFixedPoint.</summary>
+            <unmanaged>GUID_WICPixelFormat64bppRGBAFixedPoint</unmanaged>
         </member>
-        <member name="F:SharpDX.WIC.PixelFormat.Format32bppBGRA">
-            <summary>Constant Format32bppBGRA.</summary>
-            <unmanaged>GUID_WICPixelFormat32bppBGRA</unmanaged>
-        </member>
-        <member name="F:SharpDX.WIC.PixelFormat.Format128bppRGBAFloat">
-            <summary>Constant Format128bppRGBAFloat.</summary>
-            <unmanaged>GUID_WICPixelFormat128bppRGBAFloat</unmanaged>
-        </member>
-        <member name="F:SharpDX.WIC.PixelFormat.Format112bpp6ChannelsAlpha">
-            <summary>Constant Format112bpp6ChannelsAlpha.</summary>
-            <unmanaged>GUID_WICPixelFormat112bpp6ChannelsAlpha</unmanaged>
-        </member>
-        <member name="F:SharpDX.WIC.PixelFormat.Format64bppRGBAHalf">
-            <summary>Constant Format64bppRGBAHalf.</summary>
-            <unmanaged>GUID_WICPixelFormat64bppRGBAHalf</unmanaged>
+        <member name="F:SharpDX.WIC.PixelFormat.Format144bpp8ChannelsAlpha">
+            <summary>Constant Format144bpp8ChannelsAlpha.</summary>
+            <unmanaged>GUID_WICPixelFormat144bpp8ChannelsAlpha</unmanaged>
         </member>
         <member name="F:SharpDX.WIC.PixelFormat.Format16bppGrayHalf">
             <summary>Constant Format16bppGrayHalf.</summary>
             <unmanaged>GUID_WICPixelFormat16bppGrayHalf</unmanaged>
         </member>
-        <member name="F:SharpDX.WIC.PixelFormat.Format2bppIndexed">
-            <summary>Constant Format2bppIndexed.</summary>
-            <unmanaged>GUID_WICPixelFormat2bppIndexed</unmanaged>
+        <member name="F:SharpDX.WIC.PixelFormat.Format48bpp6Channels">
+            <summary>Constant Format48bpp6Channels.</summary>
+            <unmanaged>GUID_WICPixelFormat48bpp6Channels</unmanaged>
+        </member>
+        <member name="F:SharpDX.WIC.PixelFormat.Format64bpp7ChannelsAlpha">
+            <summary>Constant Format64bpp7ChannelsAlpha.</summary>
+            <unmanaged>GUID_WICPixelFormat64bpp7ChannelsAlpha</unmanaged>
         </member>
         <member name="F:SharpDX.WIC.PixelFormat.Format128bppRGBAFixedPoint">
             <summary>Constant Format128bppRGBAFixedPoint.</summary>
             <unmanaged>GUID_WICPixelFormat128bppRGBAFixedPoint</unmanaged>
         </member>
-        <member name="F:SharpDX.WIC.PixelFormat.Format32bppRGBA">
-            <summary>Constant Format32bppRGBA.</summary>
-            <unmanaged>GUID_WICPixelFormat32bppRGBA</unmanaged>
-        </member>
         <member name="F:SharpDX.WIC.PixelFormat.Format32bppRGB">
             <summary>Constant Format32bppRGB.</summary>
             <unmanaged>GUID_WICPixelFormat32bppRGB</unmanaged>
         </member>
-        <member name="F:SharpDX.WIC.PixelFormat.Format40bppCMYKAlpha">
-            <summary>Constant Format40bppCMYKAlpha.</summary>
-            <unmanaged>GUID_WICPixelFormat40bppCMYKAlpha</unmanaged>
+        <member name="F:SharpDX.WIC.PixelFormat.Format8bppIndexed">
+            <summary>Constant Format8bppIndexed.</summary>
+            <unmanaged>GUID_WICPixelFormat8bppIndexed</unmanaged>
+        </member>
+        <member name="F:SharpDX.WIC.PixelFormat.Format48bppRGB">
+            <summary>Constant Format48bppRGB.</summary>
+            <unmanaged>GUID_WICPixelFormat48bppRGB</unmanaged>
+        </member>
+        <member name="F:SharpDX.WIC.PixelFormat.Format32bpp3ChannelsAlpha">
+            <summary>Constant Format32bpp3ChannelsAlpha.</summary>
+            <unmanaged>GUID_WICPixelFormat32bpp3ChannelsAlpha</unmanaged>
+        </member>
+        <member name="F:SharpDX.WIC.PixelFormat.Format64bppCMYK">
+            <summary>Constant Format64bppCMYK.</summary>
+            <unmanaged>GUID_WICPixelFormat64bppCMYK</unmanaged>
+        </member>
+        <member name="F:SharpDX.WIC.PixelFormat.Format4bppIndexed">
+            <summary>Constant Format4bppIndexed.</summary>
+            <unmanaged>GUID_WICPixelFormat4bppIndexed</unmanaged>
+        </member>
+        <member name="F:SharpDX.WIC.PixelFormat.Format40bpp4ChannelsAlpha">
+            <summary>Constant Format40bpp4ChannelsAlpha.</summary>
+            <unmanaged>GUID_WICPixelFormat40bpp4ChannelsAlpha</unmanaged>
+        </member>
+        <member name="F:SharpDX.WIC.PixelFormat.Format64bppRGBFixedPoint">
+            <summary>Constant Format64bppRGBFixedPoint.</summary>
+            <unmanaged>GUID_WICPixelFormat64bppRGBFixedPoint</unmanaged>
+        </member>
+        <member name="F:SharpDX.WIC.PixelFormat.Format64bppPBGRA">
+            <summary>Constant Format64bppPBGRA.</summary>
+            <unmanaged>GUID_WICPixelFormat64bppPBGRA</unmanaged>
+        </member>
+        <member name="F:SharpDX.WIC.PixelFormat.Format16bppGray">
+            <summary>Constant Format16bppGray.</summary>
+            <unmanaged>GUID_WICPixelFormat16bppGray</unmanaged>
+        </member>
+        <member name="F:SharpDX.WIC.PixelFormat.Format32bppBGRA">
+            <summary>Constant Format32bppBGRA.</summary>
+            <unmanaged>GUID_WICPixelFormat32bppBGRA</unmanaged>
+        </member>
+        <member name="F:SharpDX.WIC.PixelFormat.Format80bpp4ChannelsAlpha">
+            <summary>Constant Format80bpp4ChannelsAlpha.</summary>
+            <unmanaged>GUID_WICPixelFormat80bpp4ChannelsAlpha</unmanaged>
+        </member>
+        <member name="F:SharpDX.WIC.PixelFormat.Format64bppPRGBAHalf">
+            <summary>Constant Format64bppPRGBAHalf.</summary>
+            <unmanaged>GUID_WICPixelFormat64bppPRGBAHalf</unmanaged>
+        </member>
+        <member name="F:SharpDX.WIC.PixelFormat.Format64bppRGBA">
+            <summary>Constant Format64bppRGBA.</summary>
+            <unmanaged>GUID_WICPixelFormat64bppRGBA</unmanaged>
+        </member>
+        <member name="F:SharpDX.WIC.PixelFormat.Format16bppBGRA5551">
+            <summary>Constant Format16bppBGRA5551.</summary>
+            <unmanaged>GUID_WICPixelFormat16bppBGRA5551</unmanaged>
+        </member>
+        <member name="F:SharpDX.WIC.PixelFormat.Format64bppBGRAFixedPoint">
+            <summary>Constant Format64bppBGRAFixedPoint.</summary>
+            <unmanaged>GUID_WICPixelFormat64bppBGRAFixedPoint</unmanaged>
+        </member>
+        <member name="F:SharpDX.WIC.PixelFormat.Format32bppPRGBA">
+            <summary>Constant Format32bppPRGBA.</summary>
+            <unmanaged>GUID_WICPixelFormat32bppPRGBA</unmanaged>
+        </member>
+        <member name="F:SharpDX.WIC.PixelFormat.Format96bppRGBFixedPoint">
+            <summary>Constant Format96bppRGBFixedPoint.</summary>
+            <unmanaged>GUID_WICPixelFormat96bppRGBFixedPoint</unmanaged>
+        </member>
+        <member name="F:SharpDX.WIC.PixelFormat.Format32bppGrayFloat">
+            <summary>Constant Format32bppGrayFloat.</summary>
+            <unmanaged>GUID_WICPixelFormat32bppGrayFloat</unmanaged>
+        </member>
+        <member name="F:SharpDX.WIC.PixelFormat.Format48bpp3Channels">
+            <summary>Constant Format48bpp3Channels.</summary>
+            <unmanaged>GUID_WICPixelFormat48bpp3Channels</unmanaged>
+        </member>
+        <member name="F:SharpDX.WIC.PixelFormat.Format64bppRGBAHalf">
+            <summary>Constant Format64bppRGBAHalf.</summary>
+            <unmanaged>GUID_WICPixelFormat64bppRGBAHalf</unmanaged>
+        </member>
+        <member name="F:SharpDX.WIC.PixelFormat.Format80bpp5Channels">
+            <summary>Constant Format80bpp5Channels.</summary>
+            <unmanaged>GUID_WICPixelFormat80bpp5Channels</unmanaged>
+        </member>
+        <member name="F:SharpDX.WIC.PixelFormat.Format56bpp7Channels">
+            <summary>Constant Format56bpp7Channels.</summary>
+            <unmanaged>GUID_WICPixelFormat56bpp7Channels</unmanaged>
+        </member>
+        <member name="F:SharpDX.WIC.PixelFormat.Format128bppRGBFixedPoint">
+            <summary>Constant Format128bppRGBFixedPoint.</summary>
+            <unmanaged>GUID_WICPixelFormat128bppRGBFixedPoint</unmanaged>
+        </member>
+        <member name="F:SharpDX.WIC.PixelFormat.Format64bpp4Channels">
+            <summary>Constant Format64bpp4Channels.</summary>
+            <unmanaged>GUID_WICPixelFormat64bpp4Channels</unmanaged>
+        </member>
+        <member name="F:SharpDX.WIC.PixelFormat.Format40bpp5Channels">
+            <summary>Constant Format40bpp5Channels.</summary>
+            <unmanaged>GUID_WICPixelFormat40bpp5Channels</unmanaged>
+        </member>
+        <member name="F:SharpDX.WIC.PixelFormat.Format8bppGray">
+            <summary>Constant Format8bppGray.</summary>
+            <unmanaged>GUID_WICPixelFormat8bppGray</unmanaged>
+        </member>
+        <member name="F:SharpDX.WIC.PixelFormat.Format32bppCMYK">
+            <summary>Constant Format32bppCMYK.</summary>
+            <unmanaged>GUID_WICPixelFormat32bppCMYK</unmanaged>
+        </member>
+        <member name="F:SharpDX.WIC.PixelFormat.Format32bppRGBA">
+            <summary>Constant Format32bppRGBA.</summary>
+            <unmanaged>GUID_WICPixelFormat32bppRGBA</unmanaged>
+        </member>
+        <member name="F:SharpDX.WIC.PixelFormat.Format24bppBGR">
+            <summary>Constant Format24bppBGR.</summary>
+            <unmanaged>GUID_WICPixelFormat24bppBGR</unmanaged>
+        </member>
+        <member name="F:SharpDX.WIC.PixelFormat.Format32bppRGBA1010102">
+            <summary>Constant Format32bppRGBA1010102.</summary>
+            <unmanaged>GUID_WICPixelFormat32bppRGBA1010102</unmanaged>
+        </member>
+        <member name="F:SharpDX.WIC.PixelFormat.Format4bppGray">
+            <summary>Constant Format4bppGray.</summary>
+            <unmanaged>GUID_WICPixelFormat4bppGray</unmanaged>
+        </member>
+        <member name="F:SharpDX.WIC.PixelFormat.Format64bppPRGBA">
+            <summary>Constant Format64bppPRGBA.</summary>
+            <unmanaged>GUID_WICPixelFormat64bppPRGBA</unmanaged>
+        </member>
+        <member name="F:SharpDX.WIC.PixelFormat.Format2bppGray">
+            <summary>Constant Format2bppGray.</summary>
+            <unmanaged>GUID_WICPixelFormat2bppGray</unmanaged>
+        </member>
+        <member name="F:SharpDX.WIC.PixelFormat.Format128bppRGBAFloat">
+            <summary>Constant Format128bppRGBAFloat.</summary>
+            <unmanaged>GUID_WICPixelFormat128bppRGBAFloat</unmanaged>
+        </member>
+        <member name="F:SharpDX.WIC.PixelFormat.Format48bpp5ChannelsAlpha">
+            <summary>Constant Format48bpp5ChannelsAlpha.</summary>
+            <unmanaged>GUID_WICPixelFormat48bpp5ChannelsAlpha</unmanaged>
+        </member>
+        <member name="F:SharpDX.WIC.PixelFormat.Format32bppRGBE">
+            <summary>Constant Format32bppRGBE.</summary>
+            <unmanaged>GUID_WICPixelFormat32bppRGBE</unmanaged>
+        </member>
+        <member name="F:SharpDX.WIC.PixelFormat.Format32bpp4Channels">
+            <summary>Constant Format32bpp4Channels.</summary>
+            <unmanaged>GUID_WICPixelFormat32bpp4Channels</unmanaged>
         </member>
         <member name="F:SharpDX.WIC.PixelFormat.Format56bpp6ChannelsAlpha">
             <summary>Constant Format56bpp6ChannelsAlpha.</summary>
@@ -13687,17 +13695,13 @@
             <summary>Constant Format128bppPRGBAFloat.</summary>
             <unmanaged>GUID_WICPixelFormat128bppPRGBAFloat</unmanaged>
         </member>
-        <member name="F:SharpDX.WIC.PixelFormat.Format64bpp4Channels">
-            <summary>Constant Format64bpp4Channels.</summary>
-            <unmanaged>GUID_WICPixelFormat64bpp4Channels</unmanaged>
+        <member name="F:SharpDX.WIC.PixelFormat.Format48bppBGR">
+            <summary>Constant Format48bppBGR.</summary>
+            <unmanaged>GUID_WICPixelFormat48bppBGR</unmanaged>
         </member>
-        <member name="F:SharpDX.WIC.PixelFormat.Format24bppBGR">
-            <summary>Constant Format24bppBGR.</summary>
-            <unmanaged>GUID_WICPixelFormat24bppBGR</unmanaged>
-        </member>
-        <member name="F:SharpDX.WIC.PixelFormat.Format64bpp7ChannelsAlpha">
-            <summary>Constant Format64bpp7ChannelsAlpha.</summary>
-            <unmanaged>GUID_WICPixelFormat64bpp7ChannelsAlpha</unmanaged>
+        <member name="F:SharpDX.WIC.PixelFormat.Format64bpp3ChannelsAlpha">
+            <summary>Constant Format64bpp3ChannelsAlpha.</summary>
+            <unmanaged>GUID_WICPixelFormat64bpp3ChannelsAlpha</unmanaged>
         </member>
         <member name="F:SharpDX.WIC.PixelFormat.Format64bppRGBHalf">
             <summary>Constant Format64bppRGBHalf.</summary>
@@ -13706,10 +13710,6 @@
         <member name="F:SharpDX.WIC.PixelFormat.Format8bppAlpha">
             <summary>Constant Format8bppAlpha.</summary>
             <unmanaged>GUID_WICPixelFormat8bppAlpha</unmanaged>
-        </member>
-        <member name="F:SharpDX.WIC.PixelFormat.Format32bpp4Channels">
-            <summary>Constant Format32bpp4Channels.</summary>
-            <unmanaged>GUID_WICPixelFormat32bpp4Channels</unmanaged>
         </member>
         <member name="M:SharpDX.WIC.PixelFormat.GetBitsPerPixel(System.Guid)">
             <summary>
@@ -13732,53 +13732,33 @@
             </summary>	
             <!-- No matching elements were found for the following include tag --><include file="..\..\Documentation\CodeComments.xml" path="/comments/comment[@id='SharpDX.WIC.ResultCode']/*"/>	
         </member>
-        <member name="F:SharpDX.WIC.ResultCode.Propertynotfound">
-            <summary>Constant Propertynotfound.</summary>
-            <unmanaged>WINCODEC_ERR_PROPERTYNOTFOUND</unmanaged>
-        </member>
-        <member name="F:SharpDX.WIC.ResultCode.Internalerror">
-            <summary>Constant Internalerror.</summary>
-            <unmanaged>WINCODEC_ERR_INTERNALERROR</unmanaged>
+        <member name="F:SharpDX.WIC.ResultCode.Badheader">
+            <summary>Constant Badheader.</summary>
+            <unmanaged>WINCODEC_ERR_BADHEADER</unmanaged>
         </member>
         <member name="F:SharpDX.WIC.ResultCode.UnexpectedMetadataType">
             <summary>Constant UnexpectedMetadataType.</summary>
             <unmanaged>WINCODEC_ERR_UNEXPECTEDMETADATATYPE</unmanaged>
         </member>
-        <member name="F:SharpDX.WIC.ResultCode.Unknownimageformat">
-            <summary>Constant Unknownimageformat.</summary>
-            <unmanaged>WINCODEC_ERR_UNKNOWNIMAGEFORMAT</unmanaged>
+        <member name="F:SharpDX.WIC.ResultCode.InvalidQueryCharacter">
+            <summary>Constant InvalidQueryCharacter.</summary>
+            <unmanaged>WINCODEC_ERR_INVALIDQUERYCHARACTER</unmanaged>
         </member>
         <member name="F:SharpDX.WIC.ResultCode.InvalidParameter">
             <summary>Constant InvalidParameter.</summary>
             <unmanaged>WINCODEC_ERR_INVALIDPARAMETER</unmanaged>
         </member>
-        <member name="F:SharpDX.WIC.ResultCode.SourceRectangleDoesnotmatchdimensions">
-            <summary>Constant SourceRectangleDoesnotmatchdimensions.</summary>
-            <unmanaged>WINCODEC_ERR_SOURCERECTDOESNOTMATCHDIMENSIONS</unmanaged>
+        <member name="F:SharpDX.WIC.ResultCode.Valueoutofrange">
+            <summary>Constant Valueoutofrange.</summary>
+            <unmanaged>WINCODEC_ERR_VALUEOUTOFRANGE</unmanaged>
         </member>
-        <member name="F:SharpDX.WIC.ResultCode.Requestonlyvalidatmetadataroot">
-            <summary>Constant Requestonlyvalidatmetadataroot.</summary>
-            <unmanaged>WINCODEC_ERR_REQUESTONLYVALIDATMETADATAROOT</unmanaged>
+        <member name="F:SharpDX.WIC.ResultCode.Codectoomanyscanlines">
+            <summary>Constant Codectoomanyscanlines.</summary>
+            <unmanaged>WINCODEC_ERR_CODECTOOMANYSCANLINES</unmanaged>
         </member>
-        <member name="F:SharpDX.WIC.ResultCode.StreamNotAvailable">
-            <summary>Constant StreamNotAvailable.</summary>
-            <unmanaged>WINCODEC_ERR_STREAMNOTAVAILABLE</unmanaged>
-        </member>
-        <member name="F:SharpDX.WIC.ResultCode.UnexpectedSize">
-            <summary>Constant UnexpectedSize.</summary>
-            <unmanaged>WINCODEC_ERR_UNEXPECTEDSIZE</unmanaged>
-        </member>
-        <member name="F:SharpDX.WIC.ResultCode.GenericError">
-            <summary>Constant GenericError.</summary>
-            <unmanaged>WINCODEC_ERR_GENERIC_ERROR</unmanaged>
-        </member>
-        <member name="F:SharpDX.WIC.ResultCode.TooMuchmetadata">
-            <summary>Constant TooMuchmetadata.</summary>
-            <unmanaged>WINCODEC_ERR_TOOMUCHMETADATA</unmanaged>
-        </member>
-        <member name="F:SharpDX.WIC.ResultCode.Componentnotfound">
-            <summary>Constant Componentnotfound.</summary>
-            <unmanaged>WINCODEC_ERR_COMPONENTNOTFOUND</unmanaged>
+        <member name="F:SharpDX.WIC.ResultCode.Propertysize">
+            <summary>Constant Propertysize.</summary>
+            <unmanaged>WINCODEC_ERR_PROPERTYSIZE</unmanaged>
         </member>
         <member name="F:SharpDX.WIC.ResultCode.OufOfMemory">
             <summary>Constant OufOfMemory.</summary>
@@ -13788,45 +13768,45 @@
             <summary>Constant NotInitializeD.</summary>
             <unmanaged>WINCODEC_ERR_NOTINITIALIZED</unmanaged>
         </member>
-        <member name="F:SharpDX.WIC.ResultCode.Imagesizeoutofrange">
-            <summary>Constant Imagesizeoutofrange.</summary>
-            <unmanaged>WINCODEC_ERR_IMAGESIZEOUTOFRANGE</unmanaged>
+        <member name="F:SharpDX.WIC.ResultCode.Valueoverflow">
+            <summary>Constant Valueoverflow.</summary>
+            <unmanaged>WINCODEC_ERR_VALUEOVERFLOW</unmanaged>
         </member>
         <member name="F:SharpDX.WIC.ResultCode.Paletteunavailable">
             <summary>Constant Paletteunavailable.</summary>
             <unmanaged>WINCODEC_ERR_PALETTEUNAVAILABLE</unmanaged>
         </member>
-        <member name="F:SharpDX.WIC.ResultCode.Valueoutofrange">
-            <summary>Constant Valueoutofrange.</summary>
-            <unmanaged>WINCODEC_ERR_VALUEOUTOFRANGE</unmanaged>
-        </member>
-        <member name="F:SharpDX.WIC.ResultCode.Badheader">
-            <summary>Constant Badheader.</summary>
-            <unmanaged>WINCODEC_ERR_BADHEADER</unmanaged>
-        </member>
-        <member name="F:SharpDX.WIC.ResultCode.Propertyunexpectedtype">
-            <summary>Constant Propertyunexpectedtype.</summary>
-            <unmanaged>WINCODEC_ERR_PROPERTYUNEXPECTEDTYPE</unmanaged>
+        <member name="F:SharpDX.WIC.ResultCode.Badstreamdata">
+            <summary>Constant Badstreamdata.</summary>
+            <unmanaged>WINCODEC_ERR_BADSTREAMDATA</unmanaged>
         </member>
         <member name="F:SharpDX.WIC.ResultCode.Componentinitializefailure">
             <summary>Constant Componentinitializefailure.</summary>
             <unmanaged>WINCODEC_ERR_COMPONENTINITIALIZEFAILURE</unmanaged>
         </member>
-        <member name="F:SharpDX.WIC.ResultCode.Codecnothumbnail">
-            <summary>Constant Codecnothumbnail.</summary>
-            <unmanaged>WINCODEC_ERR_CODECNOTHUMBNAIL</unmanaged>
-        </member>
-        <member name="F:SharpDX.WIC.ResultCode.UnsupportedOperation">
-            <summary>Constant UnsupportedOperation.</summary>
-            <unmanaged>WINCODEC_ERR_UNSUPPORTEDOPERATION</unmanaged>
-        </member>
-        <member name="F:SharpDX.WIC.ResultCode.InvalidQueryRequest">
-            <summary>Constant InvalidQueryRequest.</summary>
-            <unmanaged>WINCODEC_ERR_INVALIDQUERYREQUEST</unmanaged>
+        <member name="F:SharpDX.WIC.ResultCode.Imagesizeoutofrange">
+            <summary>Constant Imagesizeoutofrange.</summary>
+            <unmanaged>WINCODEC_ERR_IMAGESIZEOUTOFRANGE</unmanaged>
         </member>
         <member name="F:SharpDX.WIC.ResultCode.UnsupportedPixelFormat">
             <summary>Constant UnsupportedPixelFormat.</summary>
             <unmanaged>WINCODEC_ERR_UNSUPPORTEDPIXELFORMAT</unmanaged>
+        </member>
+        <member name="F:SharpDX.WIC.ResultCode.Componentnotfound">
+            <summary>Constant Componentnotfound.</summary>
+            <unmanaged>WINCODEC_ERR_COMPONENTNOTFOUND</unmanaged>
+        </member>
+        <member name="F:SharpDX.WIC.ResultCode.InvalidRegistration">
+            <summary>Constant InvalidRegistration.</summary>
+            <unmanaged>WINCODEC_ERR_INVALIDREGISTRATION</unmanaged>
+        </member>
+        <member name="F:SharpDX.WIC.ResultCode.UnexpectedSize">
+            <summary>Constant UnexpectedSize.</summary>
+            <unmanaged>WINCODEC_ERR_UNEXPECTEDSIZE</unmanaged>
+        </member>
+        <member name="F:SharpDX.WIC.ResultCode.Internalerror">
+            <summary>Constant Internalerror.</summary>
+            <unmanaged>WINCODEC_ERR_INTERNALERROR</unmanaged>
         </member>
         <member name="F:SharpDX.WIC.ResultCode.WrongState">
             <summary>Constant WrongState.</summary>
@@ -13836,81 +13816,97 @@
             <summary>Constant Badmetadataheader.</summary>
             <unmanaged>WINCODEC_ERR_BADMETADATAHEADER</unmanaged>
         </member>
-        <member name="F:SharpDX.WIC.ResultCode.Badstreamdata">
-            <summary>Constant Badstreamdata.</summary>
-            <unmanaged>WINCODEC_ERR_BADSTREAMDATA</unmanaged>
-        </member>
-        <member name="F:SharpDX.WIC.ResultCode.UnsupportedVersion">
-            <summary>Constant UnsupportedVersion.</summary>
-            <unmanaged>WINCODEC_ERR_UNSUPPORTEDVERSION</unmanaged>
-        </member>
-        <member name="F:SharpDX.WIC.ResultCode.Codecpresent">
-            <summary>Constant Codecpresent.</summary>
-            <unmanaged>WINCODEC_ERR_CODECPRESENT</unmanaged>
-        </member>
-        <member name="F:SharpDX.WIC.ResultCode.Alreadylocked">
-            <summary>Constant Alreadylocked.</summary>
-            <unmanaged>WINCODEC_ERR_ALREADYLOCKED</unmanaged>
-        </member>
-        <member name="F:SharpDX.WIC.ResultCode.InvalidRegistration">
-            <summary>Constant InvalidRegistration.</summary>
-            <unmanaged>WINCODEC_ERR_INVALIDREGISTRATION</unmanaged>
-        </member>
-        <member name="F:SharpDX.WIC.ResultCode.Propertysize">
-            <summary>Constant Propertysize.</summary>
-            <unmanaged>WINCODEC_ERR_PROPERTYSIZE</unmanaged>
-        </member>
-        <member name="F:SharpDX.WIC.ResultCode.FrameMissing">
-            <summary>Constant FrameMissing.</summary>
-            <unmanaged>WINCODEC_ERR_FRAMEMISSING</unmanaged>
-        </member>
-        <member name="F:SharpDX.WIC.ResultCode.InvalidProgressivelevel">
-            <summary>Constant InvalidProgressivelevel.</summary>
-            <unmanaged>WINCODEC_ERR_INVALIDPROGRESSIVELEVEL</unmanaged>
-        </member>
-        <member name="F:SharpDX.WIC.ResultCode.StreamWrite">
-            <summary>Constant StreamWrite.</summary>
-            <unmanaged>WINCODEC_ERR_STREAMWRITE</unmanaged>
-        </member>
         <member name="F:SharpDX.WIC.ResultCode.Aborted">
             <summary>Constant Aborted.</summary>
             <unmanaged>WINCODEC_ERR_ABORTED</unmanaged>
-        </member>
-        <member name="F:SharpDX.WIC.ResultCode.Propertynotsupported">
-            <summary>Constant Propertynotsupported.</summary>
-            <unmanaged>WINCODEC_ERR_PROPERTYNOTSUPPORTED</unmanaged>
-        </member>
-        <member name="F:SharpDX.WIC.ResultCode.Valueoverflow">
-            <summary>Constant Valueoverflow.</summary>
-            <unmanaged>WINCODEC_ERR_VALUEOVERFLOW</unmanaged>
-        </member>
-        <member name="F:SharpDX.WIC.ResultCode.Duplicatemetadatapresent">
-            <summary>Constant Duplicatemetadatapresent.</summary>
-            <unmanaged>WINCODEC_ERR_DUPLICATEMETADATAPRESENT</unmanaged>
-        </member>
-        <member name="F:SharpDX.WIC.ResultCode.InvalidQueryCharacter">
-            <summary>Constant InvalidQueryCharacter.</summary>
-            <unmanaged>WINCODEC_ERR_INVALIDQUERYCHARACTER</unmanaged>
-        </member>
-        <member name="F:SharpDX.WIC.ResultCode.Badimage">
-            <summary>Constant Badimage.</summary>
-            <unmanaged>WINCODEC_ERR_BADIMAGE</unmanaged>
-        </member>
-        <member name="F:SharpDX.WIC.ResultCode.Base">
-            <summary>Constant Base.</summary>
-            <unmanaged>WINCODEC_ERR_BASE</unmanaged>
-        </member>
-        <member name="F:SharpDX.WIC.ResultCode.StreamRead">
-            <summary>Constant StreamRead.</summary>
-            <unmanaged>WINCODEC_ERR_STREAMREAD</unmanaged>
         </member>
         <member name="F:SharpDX.WIC.ResultCode.NotImplemented">
             <summary>Constant NotImplemented.</summary>
             <unmanaged>WINCODEC_ERR_NOTIMPLEMENTED</unmanaged>
         </member>
+        <member name="F:SharpDX.WIC.ResultCode.StreamWrite">
+            <summary>Constant StreamWrite.</summary>
+            <unmanaged>WINCODEC_ERR_STREAMWRITE</unmanaged>
+        </member>
+        <member name="F:SharpDX.WIC.ResultCode.Base">
+            <summary>Constant Base.</summary>
+            <unmanaged>WINCODEC_ERR_BASE</unmanaged>
+        </member>
+        <member name="F:SharpDX.WIC.ResultCode.Requestonlyvalidatmetadataroot">
+            <summary>Constant Requestonlyvalidatmetadataroot.</summary>
+            <unmanaged>WINCODEC_ERR_REQUESTONLYVALIDATMETADATAROOT</unmanaged>
+        </member>
+        <member name="F:SharpDX.WIC.ResultCode.SourceRectangleDoesnotmatchdimensions">
+            <summary>Constant SourceRectangleDoesnotmatchdimensions.</summary>
+            <unmanaged>WINCODEC_ERR_SOURCERECTDOESNOTMATCHDIMENSIONS</unmanaged>
+        </member>
+        <member name="F:SharpDX.WIC.ResultCode.StreamNotAvailable">
+            <summary>Constant StreamNotAvailable.</summary>
+            <unmanaged>WINCODEC_ERR_STREAMNOTAVAILABLE</unmanaged>
+        </member>
+        <member name="F:SharpDX.WIC.ResultCode.InvalidQueryRequest">
+            <summary>Constant InvalidQueryRequest.</summary>
+            <unmanaged>WINCODEC_ERR_INVALIDQUERYREQUEST</unmanaged>
+        </member>
+        <member name="F:SharpDX.WIC.ResultCode.Unknownimageformat">
+            <summary>Constant Unknownimageformat.</summary>
+            <unmanaged>WINCODEC_ERR_UNKNOWNIMAGEFORMAT</unmanaged>
+        </member>
+        <member name="F:SharpDX.WIC.ResultCode.GenericError">
+            <summary>Constant GenericError.</summary>
+            <unmanaged>WINCODEC_ERR_GENERIC_ERROR</unmanaged>
+        </member>
+        <member name="F:SharpDX.WIC.ResultCode.InvalidProgressivelevel">
+            <summary>Constant InvalidProgressivelevel.</summary>
+            <unmanaged>WINCODEC_ERR_INVALIDPROGRESSIVELEVEL</unmanaged>
+        </member>
+        <member name="F:SharpDX.WIC.ResultCode.StreamRead">
+            <summary>Constant StreamRead.</summary>
+            <unmanaged>WINCODEC_ERR_STREAMREAD</unmanaged>
+        </member>
+        <member name="F:SharpDX.WIC.ResultCode.Codecpresent">
+            <summary>Constant Codecpresent.</summary>
+            <unmanaged>WINCODEC_ERR_CODECPRESENT</unmanaged>
+        </member>
         <member name="F:SharpDX.WIC.ResultCode.Insufficientbuffer">
             <summary>Constant Insufficientbuffer.</summary>
             <unmanaged>WINCODEC_ERR_INSUFFICIENTBUFFER</unmanaged>
+        </member>
+        <member name="F:SharpDX.WIC.ResultCode.FrameMissing">
+            <summary>Constant FrameMissing.</summary>
+            <unmanaged>WINCODEC_ERR_FRAMEMISSING</unmanaged>
+        </member>
+        <member name="F:SharpDX.WIC.ResultCode.UnsupportedVersion">
+            <summary>Constant UnsupportedVersion.</summary>
+            <unmanaged>WINCODEC_ERR_UNSUPPORTEDVERSION</unmanaged>
+        </member>
+        <member name="F:SharpDX.WIC.ResultCode.Alreadylocked">
+            <summary>Constant Alreadylocked.</summary>
+            <unmanaged>WINCODEC_ERR_ALREADYLOCKED</unmanaged>
+        </member>
+        <member name="F:SharpDX.WIC.ResultCode.Codecnothumbnail">
+            <summary>Constant Codecnothumbnail.</summary>
+            <unmanaged>WINCODEC_ERR_CODECNOTHUMBNAIL</unmanaged>
+        </member>
+        <member name="F:SharpDX.WIC.ResultCode.TooMuchmetadata">
+            <summary>Constant TooMuchmetadata.</summary>
+            <unmanaged>WINCODEC_ERR_TOOMUCHMETADATA</unmanaged>
+        </member>
+        <member name="F:SharpDX.WIC.ResultCode.Badimage">
+            <summary>Constant Badimage.</summary>
+            <unmanaged>WINCODEC_ERR_BADIMAGE</unmanaged>
+        </member>
+        <member name="F:SharpDX.WIC.ResultCode.Duplicatemetadatapresent">
+            <summary>Constant Duplicatemetadatapresent.</summary>
+            <unmanaged>WINCODEC_ERR_DUPLICATEMETADATAPRESENT</unmanaged>
+        </member>
+        <member name="F:SharpDX.WIC.ResultCode.Propertynotsupported">
+            <summary>Constant Propertynotsupported.</summary>
+            <unmanaged>WINCODEC_ERR_PROPERTYNOTSUPPORTED</unmanaged>
+        </member>
+        <member name="F:SharpDX.WIC.ResultCode.UnsupportedOperation">
+            <summary>Constant UnsupportedOperation.</summary>
+            <unmanaged>WINCODEC_ERR_UNSUPPORTEDOPERATION</unmanaged>
         </member>
         <member name="F:SharpDX.WIC.ResultCode.Win32error">
             <summary>Constant Win32error.</summary>
@@ -13920,9 +13916,13 @@
             <summary>Constant AccessDenied.</summary>
             <unmanaged>WINCODEC_ERR_ACCESSDENIED</unmanaged>
         </member>
-        <member name="F:SharpDX.WIC.ResultCode.Codectoomanyscanlines">
-            <summary>Constant Codectoomanyscanlines.</summary>
-            <unmanaged>WINCODEC_ERR_CODECTOOMANYSCANLINES</unmanaged>
+        <member name="F:SharpDX.WIC.ResultCode.Propertyunexpectedtype">
+            <summary>Constant Propertyunexpectedtype.</summary>
+            <unmanaged>WINCODEC_ERR_PROPERTYUNEXPECTEDTYPE</unmanaged>
+        </member>
+        <member name="F:SharpDX.WIC.ResultCode.Propertynotfound">
+            <summary>Constant Propertynotfound.</summary>
+            <unmanaged>WINCODEC_ERR_PROPERTYNOTFOUND</unmanaged>
         </member>
         <member name="T:SharpDX.WIC.Bitmap">
             <summary>	
@@ -14249,6 +14249,23 @@
             <msdn-id>ee690291</msdn-id>	
             <unmanaged>HRESULT IWICImagingFactory::CreateBitmapFromMemory([In] unsigned int uiWidth,[In] unsigned int uiHeight,[In] const GUID&amp; pixelFormat,[In] unsigned int cbStride,[In] unsigned int cbBufferSize,[In] void* pbBuffer,[Out, Fast] IWICBitmap** ppIBitmap)</unmanaged>	
             <unmanaged-short>IWICImagingFactory::CreateBitmapFromMemory</unmanaged-short>	
+        </member>
+        <member name="M:SharpDX.WIC.Bitmap.#ctor(SharpDX.WIC.ImagingFactory,System.Drawing.Icon)">
+            <summary>
+            Initializes a new instance of the <see cref="T:SharpDX.WIC.Bitmap"/> class from a <see cref="T:System.Drawing.Icon"/>.
+            </summary>
+            <param name="factory">The factory.</param>
+            <param name="icon">The icon.</param>
+            <unmanaged>HRESULT IWICImagingFactory::CreateBitmapFromHICON([In] HICON hIcon,[Out, Fast] IWICBitmap** ppIBitmap)</unmanaged>
+        </member>
+        <member name="M:SharpDX.WIC.Bitmap.#ctor(SharpDX.WIC.ImagingFactory,System.Drawing.Bitmap,SharpDX.WIC.BitmapAlphaChannelOption)">
+            <summary>
+            Initializes a new instance of the <see cref="T:SharpDX.WIC.Bitmap"/> class from a <see cref="T:System.Drawing.Bitmap"/>.
+            </summary>
+            <param name="factory">The factory.</param>
+            <param name="bitmap">The bitmap.</param>
+            <param name="options">The options.</param>
+            <unmanaged>HRESULT IWICImagingFactory::CreateBitmapFromHBITMAP([In] HBITMAP hBitmap,[In, Optional] HPALETTE hPalette,[In] WICBitmapAlphaChannelOption options,[Out, Fast] IWICBitmap** ppIBitmap)</unmanaged>
         </member>
         <member name="P:SharpDX.WIC.Bitmap.Palette">
             <summary>	
@@ -15074,6 +15091,25 @@
             <param name="desiredAccess">The desired access.</param>
             <param name="metadataOptions">The metadata options.</param>
             <unmanaged>HRESULT IWICImagingFactory::CreateDecoderFromFilename([In] const wchar_t* wzFilename,[In, Optional] const GUID* pguidVendor,[In] unsigned int dwDesiredAccess,[In] WICDecodeOptions metadataOptions,[Out, Fast] IWICBitmapDecoder** ppIDecoder)</unmanaged>
+        </member>
+        <member name="M:SharpDX.WIC.BitmapDecoder.#ctor(SharpDX.WIC.ImagingFactory,System.IO.FileStream,SharpDX.WIC.DecodeOptions)">
+            <summary>
+            Initializes a new instance of the <see cref="T:SharpDX.WIC.BitmapDecoder"/> class from a filestream.
+            </summary>
+            <param name="factory">The factory.</param>
+            <param name="fileStream">The filename.</param>
+            <param name="metadataOptions">The metadata options.</param>
+            <unmanaged>HRESULT IWICImagingFactory::CreateDecoderFromFileHandle([In] unsigned int hFile,[In, Optional] const GUID* pguidVendor,[In] WICDecodeOptions metadataOptions,[Out, Fast] IWICBitmapDecoder** ppIDecoder)</unmanaged>	
+        </member>
+        <member name="M:SharpDX.WIC.BitmapDecoder.#ctor(SharpDX.WIC.ImagingFactory,System.IO.FileStream,System.Guid,SharpDX.WIC.DecodeOptions)">
+            <summary>
+            Initializes a new instance of the <see cref="T:SharpDX.WIC.BitmapDecoder"/> class from a filestream.
+            </summary>
+            <param name="factory">The factory.</param>
+            <param name="fileStream">The filename.</param>
+            <param name="guidVendorRef">The GUID vendor ref.</param>
+            <param name="metadataOptions">The metadata options.</param>
+            <unmanaged>HRESULT IWICImagingFactory::CreateDecoderFromFileHandle([In] unsigned int hFile,[In, Optional] const GUID* pguidVendor,[In] WICDecodeOptions metadataOptions,[Out, Fast] IWICBitmapDecoder** ppIDecoder)</unmanaged>	
         </member>
         <member name="M:SharpDX.WIC.BitmapDecoder.QueryCapability(SharpDX.Win32.IStream)">
             <summary>
@@ -21921,10 +21957,10 @@
             <remarks>	
             <p>Note that this mapping is primarily provided for line layout engines built on top of the physical font API. Because of OpenType glyph substitution and line layout character substitution, the nominal conversion does not always correspond to how a Unicode string will map to glyph indices when rendering using a particular font face. Also, note that Unicode variant selectors provide for alternate mappings for character to glyph. This call will always return the default variant. </p>	
             </remarks>	
-            <!-- No matching elements were found for the following include tag --><include file="..\..\Documentation\CodeComments.xml" path="/comments/comment[@id='IDWriteFontFace::GetGlyphIndices']/*"/>	
+            <!-- No matching elements were found for the following include tag --><include file="..\..\Documentation\CodeComments.xml" path="/comments/comment[@id='IDWriteFontFace::GetGlyphIndicesW']/*"/>	
             <msdn-id>dd370998</msdn-id>	
-            <unmanaged>HRESULT IDWriteFontFace::GetGlyphIndices([In, Buffer] const unsigned int* codePoints,[In] unsigned int codePointCount,[Out, Buffer] unsigned short* glyphIndices)</unmanaged>	
-            <unmanaged-short>IDWriteFontFace::GetGlyphIndices</unmanaged-short>	
+            <unmanaged>HRESULT IDWriteFontFace::GetGlyphIndicesW([In, Buffer] const unsigned int* codePoints,[In] unsigned int codePointCount,[Out, Buffer] unsigned short* glyphIndices)</unmanaged>	
+            <unmanaged-short>IDWriteFontFace::GetGlyphIndicesW</unmanaged-short>	
         </member>
         <member name="M:SharpDX.DirectWrite.FontFace.TryGetFontTable(System.Int32,System.IntPtr,System.Int32@,System.IntPtr@,SharpDX.Bool@)">
             <summary>	
@@ -22584,6 +22620,22 @@
             <param name="logFont">When this method returns, contains a structure that receives a GDI-compatible font description. </param>
             <returns> TRUE if the specified font object is part of the system font collection; otherwise, FALSE. </returns>
             <unmanaged>HRESULT IDWriteGdiInterop::ConvertFontToLOGFONT([None] IDWriteFont* font,[In] LOGFONTW* logFont,[Out] BOOL* isSystemFont)</unmanaged>
+        </member>
+        <member name="M:SharpDX.DirectWrite.GdiInterop.FromSystemDrawingFont(System.Drawing.Font)">
+            <summary>	
+            Creates a font object that matches the properties specified by the LOGFONT structure. 	
+            </summary>	
+            <param name="font">A <see cref="T:System.Drawing.Font"/> description. </param>
+            <returns>a reference to a newly created <see cref="T:SharpDX.DirectWrite.Font"/>. </returns>
+            <unmanaged>HRESULT IDWriteGdiInterop::CreateFontFromLOGFONT([In] const LOGFONTW* logFont,[Out] IDWriteFont** font)</unmanaged>
+        </member>
+        <member name="M:SharpDX.DirectWrite.GdiInterop.ToSystemDrawingFont(SharpDX.DirectWrite.Font,System.Drawing.Font@)">
+            <summary>
+            Convert a Direct2D <see cref="T:SharpDX.DirectWrite.Font"/> to a <see cref="T:System.Drawing.Font"/>.
+            </summary>
+            <param name="d2dFont">a Direct2D Font</param>
+            <param name="font">a <see cref="T:System.Drawing.Font"/></param>
+            <returns>true if the specified font object is part of the system font collection; otherwise, false.</returns>
         </member>
         <member name="M:SharpDX.DirectWrite.GdiInterop.#ctor(System.IntPtr)">
             <summary>
@@ -25455,6 +25507,71 @@
             <msdn-id>dd368097</msdn-id>	
             <unmanaged>float radiusY</unmanaged>	
             <unmanaged-short>float radiusY</unmanaged-short>	
+        </member>
+        <member name="T:SharpDX.Direct2D1.GdiInteropRenderTarget">
+            <summary>	
+            <p>Provides access to an device context that can accept GDI drawing commands. </p>	
+            </summary>	
+            <remarks>	
+            <p>You don't create an <strong><see cref="T:SharpDX.Direct2D1.GdiInteropRenderTarget"/></strong> object directly; instead, you use the <strong>QueryInterface</strong> method of an existing render target instance to provide an <strong><see cref="T:SharpDX.Direct2D1.GdiInteropRenderTarget"/></strong> version of that render target. </p><p>Not all render targets support the <strong><see cref="T:SharpDX.Direct2D1.GdiInteropRenderTarget"/></strong> interface. The render target must be GDI-compatible (the <strong><see cref="F:SharpDX.Direct2D1.RenderTargetUsage.GdiCompatible"/></strong> flag was specified when creating the render target), use the <see cref="F:SharpDX.DXGI.Format.B8G8R8A8_UNorm"/> pixel format, and use  the <strong><see cref="F:SharpDX.Direct2D1.AlphaMode.Premultiplied"/></strong> or <strong><see cref="F:SharpDX.Direct2D1.AlphaMode.Ignore"/></strong> alpha mode.</p><p>Note that the <strong>QueryInterface</strong> method always succeeds; if the render target doesn't support the <strong><see cref="T:SharpDX.Direct2D1.GdiInteropRenderTarget"/></strong> interface, calling <strong>GetDC</strong> will fail. (For render targets created through the <strong>CreateCompatibleRenderTarget</strong> method, the render target that created it must have these settings.) </p><p>To test whether a given render target supports the <strong><see cref="T:SharpDX.Direct2D1.GdiInteropRenderTarget"/></strong> interface, create a <strong><see cref="T:SharpDX.Direct2D1.RenderTargetProperties"/> </strong>that specifies GDI compatibility and the appropriate pixel format, then call the render target's <strong>IsSupported</strong> method to see whether the render target is GDI-compatible. </p>	
+            </remarks>	
+            <!-- No matching elements were found for the following include tag --><include file=".\..\Documentation\CodeComments.xml" path="/comments/comment[@id='ID2D1GdiInteropRenderTarget']/*"/>	
+            <msdn-id>dd371321</msdn-id>	
+            <unmanaged>ID2D1GdiInteropRenderTarget</unmanaged>	
+            <unmanaged-short>ID2D1GdiInteropRenderTarget</unmanaged-short>	
+        </member>
+        <member name="M:SharpDX.Direct2D1.GdiInteropRenderTarget.ReleaseDC">
+            <summary>	
+            Indicates that drawing with the device context retrieved using the {{GetDC}} method is finished.  	
+            </summary>	
+            <remarks>	
+            ReleaseDC must be called once for each call to {{GetDC}}. 	
+            </remarks>	
+            <returns>If the method succeeds, it returns S_OK. Otherwise, it returns an HRESULT error code. </returns>
+            <unmanaged>HRESULT ID2D1GdiInteropRenderTarget::ReleaseDC([In, Optional] const RECT* update)</unmanaged>
+        </member>
+        <member name="M:SharpDX.Direct2D1.GdiInteropRenderTarget.#ctor(System.IntPtr)">
+            <summary>
+            Initializes a new instance of the <see cref="T:SharpDX.Direct2D1.GdiInteropRenderTarget"/> class.
+            </summary>
+            <param name="nativePtr">The native pointer.</param>	
+        </member>
+        <member name="M:SharpDX.Direct2D1.GdiInteropRenderTarget.op_Explicit(System.IntPtr)~SharpDX.Direct2D1.GdiInteropRenderTarget">
+            <summary>
+            Performs an explicit conversion from <see cref="T:System.IntPtr"/> to <see cref="T:SharpDX.Direct2D1.GdiInteropRenderTarget"/>. (This method is a shortcut to <see cref="P:SharpDX.CppObject.NativePointer"/>) 
+            </summary>
+            <param name="nativePointer">The native pointer.</param>
+            <returns>
+            The result of the conversion.
+            </returns>
+        </member>
+        <member name="M:SharpDX.Direct2D1.GdiInteropRenderTarget.GetDC(SharpDX.Direct2D1.DeviceContextInitializeMode)">
+            <summary>	
+            <p>Retrieves the device context associated with this render target. </p>	
+            </summary>	
+            <param name="mode"><dd>  <p>A value that specifies whether the device context should be cleared.</p> </dd></param>	
+            <returns><dd>  <p>When this method returns, contains the device context associated with this render target. You must allocate storage for this parameter.  </p> </dd></returns>	
+            <remarks>	
+            <p>Calling this method flushes the render target.</p><p>This command can be called only after <strong>BeginDraw</strong> and before <strong>EndDraw</strong>. It should not be called between <strong>PushAxisAlignedClip</strong>/<strong>PopAxisAlignedClip</strong> commands or between <strong>PushLayer</strong>/<strong>PopLayer</strong>.</p><p> <strong>ReleaseDC</strong> must be called once for each call to <strong>GetDC</strong>.</p>	
+            </remarks>	
+            <!-- No matching elements were found for the following include tag --><include file=".\..\Documentation\CodeComments.xml" path="/comments/comment[@id='ID2D1GdiInteropRenderTarget::GetDC']/*"/>	
+            <msdn-id>dd371323</msdn-id>	
+            <unmanaged>HRESULT ID2D1GdiInteropRenderTarget::GetDC([In] D2D1_DC_INITIALIZE_MODE mode,[Out] HDC* hdc)</unmanaged>	
+            <unmanaged-short>ID2D1GdiInteropRenderTarget::GetDC</unmanaged-short>	
+        </member>
+        <member name="M:SharpDX.Direct2D1.GdiInteropRenderTarget.ReleaseDC(System.Nullable{SharpDX.Rectangle})">
+            <summary>	
+            <p>Indicates that drawing with the device context retrieved using the <strong>GetDC</strong> method is finished.  </p>	
+            </summary>	
+            <param name="update">No documentation.</param>	
+            <returns><p>If this method succeeds, it returns <strong><see cref="F:SharpDX.Result.Ok"/></strong>. Otherwise, it returns an <strong><see cref="T:SharpDX.Result"/></strong> error code.</p></returns>	
+            <remarks>	
+            <p><strong>ReleaseDC</strong> must be called once for each call to <strong>GetDC</strong>.</p>	
+            </remarks>	
+            <!-- No matching elements were found for the following include tag --><include file=".\..\Documentation\CodeComments.xml" path="/comments/comment[@id='ID2D1GdiInteropRenderTarget::ReleaseDC']/*"/>	
+            <msdn-id>dd371327</msdn-id>	
+            <unmanaged>HRESULT ID2D1GdiInteropRenderTarget::ReleaseDC([In, Optional] const RECT* update)</unmanaged>	
+            <unmanaged-short>ID2D1GdiInteropRenderTarget::ReleaseDC</unmanaged-short>	
         </member>
         <member name="T:SharpDX.DirectWrite.Baseline">
             <summary>	
@@ -33574,7 +33691,7 @@
         </member>
         <member name="F:SharpDX.Direct2D1.BitmapOptions.GdiCompatible">
             <summary>	
-            <dd> <p>The bitmap works with <strong>ID2D1GdiInteropRenderTarget::GetDC</strong>.</p> </dd>	
+            <dd> <p>The bitmap works with <strong><see cref="M:SharpDX.Direct2D1.GdiInteropRenderTarget.GetDC(SharpDX.Direct2D1.DeviceContextInitializeMode)"/></strong>.</p> </dd>	
             </summary>	
             <!-- No matching elements were found for the following include tag --><include file=".\..\Documentation\CodeComments.xml" path="/comments/comment[@id='D2D1_BITMAP_OPTIONS_GDI_COMPATIBLE']/*"/>	
             <msdn-id>hh446984</msdn-id>	
@@ -33787,7 +33904,7 @@
             <p>[This documentation is preliminary and is subject to change.]</p><p><strong>Applies to: </strong>desktop apps | Metro style apps</p><p>Specifies how one of the color sources is to be derived and optionally specifies a preblend operation on the color source.</p>	
             </summary>	
             <remarks>	
-            <p>This enumeration has the same numeric values as <strong>D3D10_BLEND</strong>.</p>	
+            <p>This enumeration has the same numeric values as <strong><see cref="!:SharpDX.Direct3D10.BlendOption"/></strong>.</p>	
             </remarks>	
             <!-- No matching elements were found for the following include tag --><include file=".\..\Documentation\CodeComments.xml" path="/comments/comment[@id='D2D1_BLEND']/*"/>	
             <msdn-id>hh404276</msdn-id>	
@@ -35316,7 +35433,7 @@
             <p> Specifies how a device context is initialized for GDI rendering when it is retrieved from the render target.</p>	
             </summary>	
             <remarks>	
-            <p>Use this enumeration with the <strong>ID2D1GdiInteropRenderTarget::GetDC</strong> method to specify how the device context is  initialized for GDI rendering.</p>	
+            <p>Use this enumeration with the <strong><see cref="M:SharpDX.Direct2D1.GdiInteropRenderTarget.GetDC(SharpDX.Direct2D1.DeviceContextInitializeMode)"/></strong> method to specify how the device context is  initialized for GDI rendering.</p>	
             </remarks>	
             <!-- No matching elements were found for the following include tag --><include file=".\..\Documentation\CodeComments.xml" path="/comments/comment[@id='D2D1_DC_INITIALIZE_MODE']/*"/>	
             <msdn-id>dd368088</msdn-id>	
@@ -39079,17 +39196,6 @@
             </summary>	
             <!-- No matching elements were found for the following include tag --><include file=".\..\Documentation\CodeComments.xml" path="/comments/comment[@id='SharpDX.Direct2D1.D2D1']/*"/>	
         </member>
-        <member name="M:SharpDX.Direct2D1.D2D1.InvertMatrix(SharpDX.Matrix3x2@)">
-            <summary>	
-            <p>Tries to invert the specified matrix.</p>	
-            </summary>	
-            <param name="matrix"><dd>  <p>The matrix to invert.</p> </dd></param>	
-            <returns><p><strong>true</strong> if the matrix was inverted; otherwise, <strong>false</strong>.</p></returns>	
-            <!-- No matching elements were found for the following include tag --><include file=".\..\Documentation\CodeComments.xml" path="/comments/comment[@id='D2D1InvertMatrix']/*"/>	
-            <msdn-id>dd368044</msdn-id>	
-            <unmanaged>BOOL D2D1InvertMatrix([InOut] D2D_MATRIX_3X2_F* matrix)</unmanaged>	
-            <unmanaged-short>D2D1InvertMatrix</unmanaged-short>	
-        </member>
         <member name="M:SharpDX.Direct2D1.D2D1.IsMatrixInvertible(SharpDX.Matrix3x2@)">
             <summary>	
             <p>Indicates whether the specified matrix is invertible.</p>	
@@ -39101,20 +39207,16 @@
             <unmanaged>BOOL D2D1IsMatrixInvertible([In] const D2D_MATRIX_3X2_F* matrix)</unmanaged>	
             <unmanaged-short>D2D1IsMatrixInvertible</unmanaged-short>	
         </member>
-        <member name="M:SharpDX.Direct2D1.D2D1.MakeRotateMatrix(System.Single,SharpDX.DrawingPointF,SharpDX.Matrix3x2@)">
+        <member name="M:SharpDX.Direct2D1.D2D1.InvertMatrix(SharpDX.Matrix3x2@)">
             <summary>	
-            <p>Creates a rotation transformation that rotates by the specified angle about the specified point.</p>	
+            <p>Tries to invert the specified matrix.</p>	
             </summary>	
-            <param name="angle"><dd>  <p>The clockwise rotation angle, in degrees. </p> </dd></param>	
-            <param name="center"><dd>  <p>The point about which to rotate.</p> </dd></param>	
-            <param name="matrix"><dd>  <p>When this method returns, contains the new rotation transformation. You must allocate storage for this parameter.  </p> </dd></param>	
-            <remarks>	
-            <p>Rotation occurs in the plane of the 2-D surface.</p>	
-            </remarks>	
-            <!-- No matching elements were found for the following include tag --><include file=".\..\Documentation\CodeComments.xml" path="/comments/comment[@id='D2D1MakeRotateMatrix']/*"/>	
-            <msdn-id>dd368049</msdn-id>	
-            <unmanaged>void D2D1MakeRotateMatrix([In] float angle,[In] D2D_POINT_2F center,[Out] D2D_MATRIX_3X2_F* matrix)</unmanaged>	
-            <unmanaged-short>D2D1MakeRotateMatrix</unmanaged-short>	
+            <param name="matrix"><dd>  <p>The matrix to invert.</p> </dd></param>	
+            <returns><p><strong>true</strong> if the matrix was inverted; otherwise, <strong>false</strong>.</p></returns>	
+            <!-- No matching elements were found for the following include tag --><include file=".\..\Documentation\CodeComments.xml" path="/comments/comment[@id='D2D1InvertMatrix']/*"/>	
+            <msdn-id>dd368044</msdn-id>	
+            <unmanaged>BOOL D2D1InvertMatrix([InOut] D2D_MATRIX_3X2_F* matrix)</unmanaged>	
+            <unmanaged-short>D2D1InvertMatrix</unmanaged-short>	
         </member>
         <member name="M:SharpDX.Direct2D1.D2D1.CreateFactory(SharpDX.Direct2D1.FactoryType,System.Guid,System.Nullable{SharpDX.Direct2D1.FactoryOptions},System.IntPtr@)">
             <summary>	
@@ -39146,6 +39248,45 @@
             <unmanaged>void D2D1MakeSkewMatrix([In] float angleX,[In] float angleY,[In] D2D_POINT_2F center,[Out] D2D_MATRIX_3X2_F* matrix)</unmanaged>	
             <unmanaged-short>D2D1MakeSkewMatrix</unmanaged-short>	
         </member>
+        <member name="M:SharpDX.Direct2D1.D2D1.MakeRotateMatrix(System.Single,SharpDX.DrawingPointF,SharpDX.Matrix3x2@)">
+            <summary>	
+            <p>Creates a rotation transformation that rotates by the specified angle about the specified point.</p>	
+            </summary>	
+            <param name="angle"><dd>  <p>The clockwise rotation angle, in degrees. </p> </dd></param>	
+            <param name="center"><dd>  <p>The point about which to rotate.</p> </dd></param>	
+            <param name="matrix"><dd>  <p>When this method returns, contains the new rotation transformation. You must allocate storage for this parameter.  </p> </dd></param>	
+            <remarks>	
+            <p>Rotation occurs in the plane of the 2-D surface.</p>	
+            </remarks>	
+            <!-- No matching elements were found for the following include tag --><include file=".\..\Documentation\CodeComments.xml" path="/comments/comment[@id='D2D1MakeRotateMatrix']/*"/>	
+            <msdn-id>dd368049</msdn-id>	
+            <unmanaged>void D2D1MakeRotateMatrix([In] float angle,[In] D2D_POINT_2F center,[Out] D2D_MATRIX_3X2_F* matrix)</unmanaged>	
+            <unmanaged-short>D2D1MakeRotateMatrix</unmanaged-short>	
+        </member>
+        <member name="M:SharpDX.Direct2D1.D2D1.Tan(System.Single)">
+            <summary>	
+            <p>[This documentation is preliminary and is subject to change.]</p><p><strong>Applies to: </strong>desktop apps | Metro style apps</p><p>TBD</p>	
+            </summary>	
+            <param name="angle"><dd>  <p>TBD</p> </dd></param>	
+            <returns><p>TBD</p></returns>	
+            <!-- No matching elements were found for the following include tag --><include file=".\..\Documentation\CodeComments.xml" path="/comments/comment[@id='D2D1Tan']/*"/>	
+            <msdn-id>hh847941</msdn-id>	
+            <unmanaged>float D2D1Tan([In] float angle)</unmanaged>	
+            <unmanaged-short>D2D1Tan</unmanaged-short>	
+        </member>
+        <member name="M:SharpDX.Direct2D1.D2D1.Vec3Length(System.Single,System.Single,System.Single)">
+            <summary>	
+            <p>[This documentation is preliminary and is subject to change.]</p><p><strong>Applies to: </strong>desktop apps | Metro style apps</p><p>TBD</p>	
+            </summary>	
+            <param name="x"><dd>  <p>TBD</p> </dd></param>	
+            <param name="y"><dd>  <p>TBD</p> </dd></param>	
+            <param name="z"><dd>  <p>TBD</p> </dd></param>	
+            <returns><p>TBD</p></returns>	
+            <!-- No matching elements were found for the following include tag --><include file=".\..\Documentation\CodeComments.xml" path="/comments/comment[@id='D2D1Vec3Length']/*"/>	
+            <msdn-id>hh847942</msdn-id>	
+            <unmanaged>float D2D1Vec3Length([In] float x,[In] float y,[In] float z)</unmanaged>	
+            <unmanaged-short>D2D1Vec3Length</unmanaged-short>	
+        </member>
         <member name="M:SharpDX.Direct2D1.D2D1.SinCos(System.Single,System.Single@,System.Single@)">
             <summary>	
             <p>[This documentation is preliminary and is subject to change.]</p><p><strong>Applies to: </strong>desktop apps | Metro style apps</p><p>TBD</p>	
@@ -39174,16 +39315,18 @@
             <unmanaged>HRESULT D2D1CreateDevice([In] IDXGIDevice* dxgiDevice,[In, Optional] const D2D1_CREATION_PROPERTIES* creationProperties,[Out, Fast] ID2D1Device** d2dDevice)</unmanaged>	
             <unmanaged-short>D2D1CreateDevice</unmanaged-short>	
         </member>
-        <member name="M:SharpDX.Direct2D1.D2D1.Tan(System.Single)">
+        <member name="M:SharpDX.Direct2D1.D2D1.ConvertColorSpace(SharpDX.Direct2D1.ColorSpace,SharpDX.Direct2D1.ColorSpace,SharpDX.Color4)">
             <summary>	
             <p>[This documentation is preliminary and is subject to change.]</p><p><strong>Applies to: </strong>desktop apps | Metro style apps</p><p>TBD</p>	
             </summary>	
-            <param name="angle"><dd>  <p>TBD</p> </dd></param>	
+            <param name="sourceColorSpace"><dd>  <p>TBD</p> </dd></param>	
+            <param name="destinationColorSpace"><dd>  <p>TBD</p> </dd></param>	
+            <param name="color"><dd>  <p>TBD</p> </dd></param>	
             <returns><p>TBD</p></returns>	
-            <!-- No matching elements were found for the following include tag --><include file=".\..\Documentation\CodeComments.xml" path="/comments/comment[@id='D2D1Tan']/*"/>	
-            <msdn-id>hh847941</msdn-id>	
-            <unmanaged>float D2D1Tan([In] float angle)</unmanaged>	
-            <unmanaged-short>D2D1Tan</unmanaged-short>	
+            <!-- No matching elements were found for the following include tag --><include file=".\..\Documentation\CodeComments.xml" path="/comments/comment[@id='D2D1ConvertColorSpace']/*"/>	
+            <msdn-id>hh847939</msdn-id>	
+            <unmanaged>D2D_COLOR_F D2D1ConvertColorSpace([In] D2D1_COLOR_SPACE sourceColorSpace,[In] D2D1_COLOR_SPACE destinationColorSpace,[In] const D2D_COLOR_F* color)</unmanaged>	
+            <unmanaged-short>D2D1ConvertColorSpace</unmanaged-short>	
         </member>
         <member name="M:SharpDX.Direct2D1.D2D1.CreateDeviceContext(SharpDX.DXGI.Surface,System.Nullable{SharpDX.Direct2D1.CreationProperties},SharpDX.Direct2D1.DeviceContext)">
             <summary>	
@@ -39201,73 +39344,19 @@
             <unmanaged>HRESULT D2D1CreateDeviceContext([In] IDXGISurface* dxgiSurface,[In, Optional] const D2D1_CREATION_PROPERTIES* creationProperties,[Out, Fast] ID2D1DeviceContext** d2dDeviceContext)</unmanaged>	
             <unmanaged-short>D2D1CreateDeviceContext</unmanaged-short>	
         </member>
-        <member name="M:SharpDX.Direct2D1.D2D1.ConvertColorSpace(SharpDX.Direct2D1.ColorSpace,SharpDX.Direct2D1.ColorSpace,SharpDX.Color4)">
-            <summary>	
-            <p>[This documentation is preliminary and is subject to change.]</p><p><strong>Applies to: </strong>desktop apps | Metro style apps</p><p>TBD</p>	
-            </summary>	
-            <param name="sourceColorSpace"><dd>  <p>TBD</p> </dd></param>	
-            <param name="destinationColorSpace"><dd>  <p>TBD</p> </dd></param>	
-            <param name="color"><dd>  <p>TBD</p> </dd></param>	
-            <returns><p>TBD</p></returns>	
-            <!-- No matching elements were found for the following include tag --><include file=".\..\Documentation\CodeComments.xml" path="/comments/comment[@id='D2D1ConvertColorSpace']/*"/>	
-            <msdn-id>hh847939</msdn-id>	
-            <unmanaged>D2D_COLOR_F D2D1ConvertColorSpace([In] D2D1_COLOR_SPACE sourceColorSpace,[In] D2D1_COLOR_SPACE destinationColorSpace,[In] const D2D_COLOR_F* color)</unmanaged>	
-            <unmanaged-short>D2D1ConvertColorSpace</unmanaged-short>	
-        </member>
-        <member name="M:SharpDX.Direct2D1.D2D1.Vec3Length(System.Single,System.Single,System.Single)">
-            <summary>	
-            <p>[This documentation is preliminary and is subject to change.]</p><p><strong>Applies to: </strong>desktop apps | Metro style apps</p><p>TBD</p>	
-            </summary>	
-            <param name="x"><dd>  <p>TBD</p> </dd></param>	
-            <param name="y"><dd>  <p>TBD</p> </dd></param>	
-            <param name="z"><dd>  <p>TBD</p> </dd></param>	
-            <returns><p>TBD</p></returns>	
-            <!-- No matching elements were found for the following include tag --><include file=".\..\Documentation\CodeComments.xml" path="/comments/comment[@id='D2D1Vec3Length']/*"/>	
-            <msdn-id>hh847942</msdn-id>	
-            <unmanaged>float D2D1Vec3Length([In] float x,[In] float y,[In] float z)</unmanaged>	
-            <unmanaged-short>D2D1Vec3Length</unmanaged-short>	
-        </member>
         <member name="T:SharpDX.Direct2D1.ResultCode">
             <summary>	
             Functions	
             </summary>	
             <!-- No matching elements were found for the following include tag --><include file=".\..\Documentation\CodeComments.xml" path="/comments/comment[@id='SharpDX.Direct2D1.ResultCode']/*"/>	
         </member>
-        <member name="F:SharpDX.Direct2D1.ResultCode.PopCallDidNotMatchPush">
-            <summary>Constant PopCallDidNotMatchPush.</summary>
-            <unmanaged>D2DERR_POP_CALL_DID_NOT_MATCH_PUSH</unmanaged>
-        </member>
         <member name="F:SharpDX.Direct2D1.ResultCode.BadNumber">
             <summary>Constant BadNumber.</summary>
             <unmanaged>D2DERR_BAD_NUMBER</unmanaged>
         </member>
-        <member name="F:SharpDX.Direct2D1.ResultCode.TooManyTransformInputs">
-            <summary>Constant TooManyTransformInputs.</summary>
-            <unmanaged>D2DERR_TOO_MANY_TRANSFORM_INPUTS</unmanaged>
-        </member>
-        <member name="F:SharpDX.Direct2D1.ResultCode.NoSubProperties">
-            <summary>Constant NoSubProperties.</summary>
-            <unmanaged>D2DERR_NO_SUBPROPERTIES</unmanaged>
-        </member>
-        <member name="F:SharpDX.Direct2D1.ResultCode.TargetNotGdiCompatible">
-            <summary>Constant TargetNotGdiCompatible.</summary>
-            <unmanaged>D2DERR_TARGET_NOT_GDI_COMPATIBLE</unmanaged>
-        </member>
-        <member name="F:SharpDX.Direct2D1.ResultCode.InvalidInternalGraphConfiguration">
-            <summary>Constant InvalidInternalGraphConfiguration.</summary>
-            <unmanaged>D2DERR_INVALID_INTERNAL_GRAPH_CONFIGURATION</unmanaged>
-        </member>
-        <member name="F:SharpDX.Direct2D1.ResultCode.RenderTargetHasLayerOrCliprect">
-            <summary>Constant RenderTargetHasLayerOrCliprect.</summary>
-            <unmanaged>D2DERR_RENDER_TARGET_HAS_LAYER_OR_CLIPRECT</unmanaged>
-        </member>
-        <member name="F:SharpDX.Direct2D1.ResultCode.InvalidProperty">
-            <summary>Constant InvalidProperty.</summary>
-            <unmanaged>D2DERR_INVALID_PROPERTY</unmanaged>
-        </member>
-        <member name="F:SharpDX.Direct2D1.ResultCode.InvalidGraphConfiguration">
-            <summary>Constant InvalidGraphConfiguration.</summary>
-            <unmanaged>D2DERR_INVALID_GRAPH_CONFIGURATION</unmanaged>
+        <member name="F:SharpDX.Direct2D1.ResultCode.WrongFactory">
+            <summary>Constant WrongFactory.</summary>
+            <unmanaged>D2DERR_WRONG_FACTORY</unmanaged>
         </member>
         <member name="F:SharpDX.Direct2D1.ResultCode.MaximumTextureSizeExceeded">
             <summary>Constant MaximumTextureSizeExceeded.</summary>
@@ -39277,113 +39366,53 @@
             <summary>Constant NoHardwareDevice.</summary>
             <unmanaged>D2DERR_NO_HARDWARE_DEVICE</unmanaged>
         </member>
-        <member name="F:SharpDX.Direct2D1.ResultCode.PushPopUnbalanced">
-            <summary>Constant PushPopUnbalanced.</summary>
-            <unmanaged>D2DERR_PUSH_POP_UNBALANCED</unmanaged>
-        </member>
-        <member name="F:SharpDX.Direct2D1.ResultCode.BitmapBoundAsTarget">
-            <summary>Constant BitmapBoundAsTarget.</summary>
-            <unmanaged>D2DERR_BITMAP_BOUND_AS_TARGET</unmanaged>
-        </member>
         <member name="F:SharpDX.Direct2D1.ResultCode.WrongResourceDomain">
             <summary>Constant WrongResourceDomain.</summary>
             <unmanaged>D2DERR_WRONG_RESOURCE_DOMAIN</unmanaged>
+        </member>
+        <member name="F:SharpDX.Direct2D1.ResultCode.InvalidCall">
+            <summary>Constant InvalidCall.</summary>
+            <unmanaged>D2DERR_INVALID_CALL</unmanaged>
         </member>
         <member name="F:SharpDX.Direct2D1.ResultCode.Win32Error">
             <summary>Constant Win32Error.</summary>
             <unmanaged>D2DERR_WIN32_ERROR</unmanaged>
         </member>
-        <member name="F:SharpDX.Direct2D1.ResultCode.RecreateTarget">
-            <summary>Constant RecreateTarget.</summary>
-            <unmanaged>D2DERR_RECREATE_TARGET</unmanaged>
+        <member name="F:SharpDX.Direct2D1.ResultCode.NoSubProperties">
+            <summary>Constant NoSubProperties.</summary>
+            <unmanaged>D2DERR_NO_SUBPROPERTIES</unmanaged>
+        </member>
+        <member name="F:SharpDX.Direct2D1.ResultCode.PopCallDidNotMatchPush">
+            <summary>Constant PopCallDidNotMatchPush.</summary>
+            <unmanaged>D2DERR_POP_CALL_DID_NOT_MATCH_PUSH</unmanaged>
         </member>
         <member name="F:SharpDX.Direct2D1.ResultCode.PrintJobClosed">
             <summary>Constant PrintJobClosed.</summary>
             <unmanaged>D2DERR_PRINT_JOB_CLOSED</unmanaged>
         </member>
-        <member name="F:SharpDX.Direct2D1.ResultCode.WrongFactory">
-            <summary>Constant WrongFactory.</summary>
-            <unmanaged>D2DERR_WRONG_FACTORY</unmanaged>
-        </member>
-        <member name="F:SharpDX.Direct2D1.ResultCode.WrongState">
-            <summary>Constant WrongState.</summary>
-            <unmanaged>D2DERR_WRONG_STATE</unmanaged>
-        </member>
-        <member name="F:SharpDX.Direct2D1.ResultCode.InternalError">
-            <summary>Constant InternalError.</summary>
-            <unmanaged>D2DERR_INTERNAL_ERROR</unmanaged>
-        </member>
-        <member name="F:SharpDX.Direct2D1.ResultCode.OutstandingBitmapReferences">
-            <summary>Constant OutstandingBitmapReferences.</summary>
-            <unmanaged>D2DERR_OUTSTANDING_BITMAP_REFERENCES</unmanaged>
-        </member>
-        <member name="F:SharpDX.Direct2D1.ResultCode.ExceedsMaximumBitmapSize">
-            <summary>Constant ExceedsMaximumBitmapSize.</summary>
-            <unmanaged>D2DERR_EXCEEDS_MAX_BITMAP_SIZE</unmanaged>
-        </member>
-        <member name="F:SharpDX.Direct2D1.ResultCode.LayerAlreadyInUse">
-            <summary>Constant LayerAlreadyInUse.</summary>
-            <unmanaged>D2DERR_LAYER_ALREADY_IN_USE</unmanaged>
-        </member>
-        <member name="F:SharpDX.Direct2D1.ResultCode.CyclicGraph">
-            <summary>Constant CyclicGraph.</summary>
-            <unmanaged>D2DERR_CYCLIC_GRAPH</unmanaged>
-        </member>
-        <member name="F:SharpDX.Direct2D1.ResultCode.DisplayStateInvalid">
-            <summary>Constant DisplayStateInvalid.</summary>
-            <unmanaged>D2DERR_DISPLAY_STATE_INVALID</unmanaged>
-        </member>
-        <member name="F:SharpDX.Direct2D1.ResultCode.ShaderCompileFailed">
-            <summary>Constant ShaderCompileFailed.</summary>
-            <unmanaged>D2DERR_SHADER_COMPILE_FAILED</unmanaged>
-        </member>
-        <member name="F:SharpDX.Direct2D1.ResultCode.NotInitializeD">
-            <summary>Constant NotInitializeD.</summary>
-            <unmanaged>D2DERR_NOT_INITIALIZED</unmanaged>
-        </member>
-        <member name="F:SharpDX.Direct2D1.ResultCode.InvalidTarget">
-            <summary>Constant InvalidTarget.</summary>
-            <unmanaged>D2DERR_INVALID_TARGET</unmanaged>
-        </member>
-        <member name="F:SharpDX.Direct2D1.ResultCode.TextEffectIsWrongType">
-            <summary>Constant TextEffectIsWrongType.</summary>
-            <unmanaged>D2DERR_TEXT_EFFECT_IS_WRONG_TYPE</unmanaged>
-        </member>
-        <member name="F:SharpDX.Direct2D1.ResultCode.UnsupportedOperation">
-            <summary>Constant UnsupportedOperation.</summary>
-            <unmanaged>D2DERR_UNSUPPORTED_OPERATION</unmanaged>
-        </member>
         <member name="F:SharpDX.Direct2D1.ResultCode.UnsupportedVersion">
             <summary>Constant UnsupportedVersion.</summary>
             <unmanaged>D2DERR_UNSUPPORTED_VERSION</unmanaged>
-        </member>
-        <member name="F:SharpDX.Direct2D1.ResultCode.InsufficientDeviceCapabilities">
-            <summary>Constant InsufficientDeviceCapabilities.</summary>
-            <unmanaged>D2DERR_INSUFFICIENT_DEVICE_CAPABILITIES</unmanaged>
         </member>
         <member name="F:SharpDX.Direct2D1.ResultCode.IntermediateTooLarge">
             <summary>Constant IntermediateTooLarge.</summary>
             <unmanaged>D2DERR_INTERMEDIATE_TOO_LARGE</unmanaged>
         </member>
+        <member name="F:SharpDX.Direct2D1.ResultCode.RecreateTarget">
+            <summary>Constant RecreateTarget.</summary>
+            <unmanaged>D2DERR_RECREATE_TARGET</unmanaged>
+        </member>
         <member name="F:SharpDX.Direct2D1.ResultCode.ZeroVector">
             <summary>Constant ZeroVector.</summary>
             <unmanaged>D2DERR_ZERO_VECTOR</unmanaged>
         </member>
-        <member name="F:SharpDX.Direct2D1.ResultCode.OriginalTargetNotBound">
-            <summary>Constant OriginalTargetNotBound.</summary>
-            <unmanaged>D2DERR_ORIGINAL_TARGET_NOT_BOUND</unmanaged>
+        <member name="F:SharpDX.Direct2D1.ResultCode.UnsupportedPixelFormat">
+            <summary>Constant UnsupportedPixelFormat.</summary>
+            <unmanaged>D2DERR_UNSUPPORTED_PIXEL_FORMAT</unmanaged>
         </member>
-        <member name="F:SharpDX.Direct2D1.ResultCode.DisplayFormatNotSupported">
-            <summary>Constant DisplayFormatNotSupported.</summary>
-            <unmanaged>D2DERR_DISPLAY_FORMAT_NOT_SUPPORTED</unmanaged>
-        </member>
-        <member name="F:SharpDX.Direct2D1.ResultCode.EffectIsNotRegistered">
-            <summary>Constant EffectIsNotRegistered.</summary>
-            <unmanaged>D2DERR_EFFECT_IS_NOT_REGISTERED</unmanaged>
-        </member>
-        <member name="F:SharpDX.Direct2D1.ResultCode.InvalidCall">
-            <summary>Constant InvalidCall.</summary>
-            <unmanaged>D2DERR_INVALID_CALL</unmanaged>
+        <member name="F:SharpDX.Direct2D1.ResultCode.ShaderCompileFailed">
+            <summary>Constant ShaderCompileFailed.</summary>
+            <unmanaged>D2DERR_SHADER_COMPILE_FAILED</unmanaged>
         </member>
         <member name="F:SharpDX.Direct2D1.ResultCode.ScannerFailed">
             <summary>Constant ScannerFailed.</summary>
@@ -39397,9 +39426,9 @@
             <summary>Constant TextRendererNotReleased.</summary>
             <unmanaged>D2DERR_TEXT_RENDERER_NOT_RELEASED</unmanaged>
         </member>
-        <member name="F:SharpDX.Direct2D1.ResultCode.PrintFormatNotSupported">
-            <summary>Constant PrintFormatNotSupported.</summary>
-            <unmanaged>D2DERR_PRINT_FORMAT_NOT_SUPPORTED</unmanaged>
+        <member name="F:SharpDX.Direct2D1.ResultCode.CyclicGraph">
+            <summary>Constant CyclicGraph.</summary>
+            <unmanaged>D2DERR_CYCLIC_GRAPH</unmanaged>
         </member>
         <member name="F:SharpDX.Direct2D1.ResultCode.BitmapCannotDraw">
             <summary>Constant BitmapCannotDraw.</summary>
@@ -39412,6 +39441,98 @@
         <member name="F:SharpDX.Direct2D1.ResultCode.ScreenAccessDenied">
             <summary>Constant ScreenAccessDenied.</summary>
             <unmanaged>D2DERR_SCREEN_ACCESS_DENIED</unmanaged>
+        </member>
+        <member name="F:SharpDX.Direct2D1.ResultCode.InvalidInternalGraphConfiguration">
+            <summary>Constant InvalidInternalGraphConfiguration.</summary>
+            <unmanaged>D2DERR_INVALID_INTERNAL_GRAPH_CONFIGURATION</unmanaged>
+        </member>
+        <member name="F:SharpDX.Direct2D1.ResultCode.LayerAlreadyInUse">
+            <summary>Constant LayerAlreadyInUse.</summary>
+            <unmanaged>D2DERR_LAYER_ALREADY_IN_USE</unmanaged>
+        </member>
+        <member name="F:SharpDX.Direct2D1.ResultCode.BitmapBoundAsTarget">
+            <summary>Constant BitmapBoundAsTarget.</summary>
+            <unmanaged>D2DERR_BITMAP_BOUND_AS_TARGET</unmanaged>
+        </member>
+        <member name="F:SharpDX.Direct2D1.ResultCode.InternalError">
+            <summary>Constant InternalError.</summary>
+            <unmanaged>D2DERR_INTERNAL_ERROR</unmanaged>
+        </member>
+        <member name="F:SharpDX.Direct2D1.ResultCode.InvalidProperty">
+            <summary>Constant InvalidProperty.</summary>
+            <unmanaged>D2DERR_INVALID_PROPERTY</unmanaged>
+        </member>
+        <member name="F:SharpDX.Direct2D1.ResultCode.EffectIsNotRegistered">
+            <summary>Constant EffectIsNotRegistered.</summary>
+            <unmanaged>D2DERR_EFFECT_IS_NOT_REGISTERED</unmanaged>
+        </member>
+        <member name="F:SharpDX.Direct2D1.ResultCode.RenderTargetHasLayerOrCliprect">
+            <summary>Constant RenderTargetHasLayerOrCliprect.</summary>
+            <unmanaged>D2DERR_RENDER_TARGET_HAS_LAYER_OR_CLIPRECT</unmanaged>
+        </member>
+        <member name="F:SharpDX.Direct2D1.ResultCode.TooManyTransformInputs">
+            <summary>Constant TooManyTransformInputs.</summary>
+            <unmanaged>D2DERR_TOO_MANY_TRANSFORM_INPUTS</unmanaged>
+        </member>
+        <member name="F:SharpDX.Direct2D1.ResultCode.OutstandingBitmapReferences">
+            <summary>Constant OutstandingBitmapReferences.</summary>
+            <unmanaged>D2DERR_OUTSTANDING_BITMAP_REFERENCES</unmanaged>
+        </member>
+        <member name="F:SharpDX.Direct2D1.ResultCode.InvalidTarget">
+            <summary>Constant InvalidTarget.</summary>
+            <unmanaged>D2DERR_INVALID_TARGET</unmanaged>
+        </member>
+        <member name="F:SharpDX.Direct2D1.ResultCode.WrongState">
+            <summary>Constant WrongState.</summary>
+            <unmanaged>D2DERR_WRONG_STATE</unmanaged>
+        </member>
+        <member name="F:SharpDX.Direct2D1.ResultCode.InvalidGraphConfiguration">
+            <summary>Constant InvalidGraphConfiguration.</summary>
+            <unmanaged>D2DERR_INVALID_GRAPH_CONFIGURATION</unmanaged>
+        </member>
+        <member name="F:SharpDX.Direct2D1.ResultCode.DisplayStateInvalid">
+            <summary>Constant DisplayStateInvalid.</summary>
+            <unmanaged>D2DERR_DISPLAY_STATE_INVALID</unmanaged>
+        </member>
+        <member name="F:SharpDX.Direct2D1.ResultCode.TextEffectIsWrongType">
+            <summary>Constant TextEffectIsWrongType.</summary>
+            <unmanaged>D2DERR_TEXT_EFFECT_IS_WRONG_TYPE</unmanaged>
+        </member>
+        <member name="F:SharpDX.Direct2D1.ResultCode.UnsupportedOperation">
+            <summary>Constant UnsupportedOperation.</summary>
+            <unmanaged>D2DERR_UNSUPPORTED_OPERATION</unmanaged>
+        </member>
+        <member name="F:SharpDX.Direct2D1.ResultCode.PushPopUnbalanced">
+            <summary>Constant PushPopUnbalanced.</summary>
+            <unmanaged>D2DERR_PUSH_POP_UNBALANCED</unmanaged>
+        </member>
+        <member name="F:SharpDX.Direct2D1.ResultCode.DisplayFormatNotSupported">
+            <summary>Constant DisplayFormatNotSupported.</summary>
+            <unmanaged>D2DERR_DISPLAY_FORMAT_NOT_SUPPORTED</unmanaged>
+        </member>
+        <member name="F:SharpDX.Direct2D1.ResultCode.OriginalTargetNotBound">
+            <summary>Constant OriginalTargetNotBound.</summary>
+            <unmanaged>D2DERR_ORIGINAL_TARGET_NOT_BOUND</unmanaged>
+        </member>
+        <member name="F:SharpDX.Direct2D1.ResultCode.PrintFormatNotSupported">
+            <summary>Constant PrintFormatNotSupported.</summary>
+            <unmanaged>D2DERR_PRINT_FORMAT_NOT_SUPPORTED</unmanaged>
+        </member>
+        <member name="F:SharpDX.Direct2D1.ResultCode.NotInitializeD">
+            <summary>Constant NotInitializeD.</summary>
+            <unmanaged>D2DERR_NOT_INITIALIZED</unmanaged>
+        </member>
+        <member name="F:SharpDX.Direct2D1.ResultCode.TargetNotGdiCompatible">
+            <summary>Constant TargetNotGdiCompatible.</summary>
+            <unmanaged>D2DERR_TARGET_NOT_GDI_COMPATIBLE</unmanaged>
+        </member>
+        <member name="F:SharpDX.Direct2D1.ResultCode.ExceedsMaximumBitmapSize">
+            <summary>Constant ExceedsMaximumBitmapSize.</summary>
+            <unmanaged>D2DERR_EXCEEDS_MAX_BITMAP_SIZE</unmanaged>
+        </member>
+        <member name="F:SharpDX.Direct2D1.ResultCode.InsufficientDeviceCapabilities">
+            <summary>Constant InsufficientDeviceCapabilities.</summary>
+            <unmanaged>D2DERR_INSUFFICIENT_DEVICE_CAPABILITIES</unmanaged>
         </member>
         <member name="T:SharpDX.Direct2D1.DeviceContextRenderTarget">
             <summary>	

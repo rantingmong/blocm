@@ -1,4 +1,4 @@
-﻿﻿/*  Minecraft NBT reader
+﻿/*  Minecraft NBT reader
  * 
  *  Copyright 2010-2013 Michael Ong, all rights reserved.
  *  
@@ -20,13 +20,13 @@
 namespace NBT.Utils
 {
     /// <summary>
-    /// Indicates the last update the chunk has made.
+    ///     Indicates the last update the chunk has made.
     /// </summary>
     public struct TimeStamp
     {
-	    /// <summary>
-	    /// The value of the last update time.
-	    /// </summary>
-	    public long Timestamp { get; set; }
+        /// <summary>
+        ///     The value of the last update time.
+        /// </summary>
+        public long Timestamp { get; set; }
     }
 }

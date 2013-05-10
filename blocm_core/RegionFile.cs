@@ -22,68 +22,80 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Threading;
-
 using NBT.Utils;
 
 namespace NBT
 {
     /// <summary>
-    /// A Minecraft region file.
+    ///     A Minecraft region file.
     /// </summary>
     public class RegionFile : IDisposable
     {
-	    /// <summary>
-	    /// The maximum threads the region reader will allocate (use 2^n values).
-	    /// </summary>
-	    public	const int			MaxThreads	= 4;
-
-	    /// <summary>
-	    /// The content of the region file.
-	    /// </summary>
-	    public	NbtFile[]			Content		{ get; private set; }
-
-	    private Offset[]			offsets;
-		private TimeStamp[]			timeStamps;
+        /// <summary>
+        ///     The maximum threads the region reader will allocate (use 2^n values).
+        /// </summary>
+        public const int MaxThreads = 4;
 
         /// <summary>
-        /// Gets a chunk from this region.
+        ///     Maximum number of chunks per thread.
+        /// </summary>
+        public const int chunkSlice = 1024 / MaxThreads;
+
+        private Offset[] offsets;
+        private TimeStamp[] timeStamps;
+
+        private RegionFile()
+        {
+            offsets = new Offset[1024];
+            timeStamps = new TimeStamp[1024];
+        }
+
+        /// <summary>
+        ///     The content of the region file.
+        /// </summary>
+        public NbtFile[] Content { get; private set; }
+
+        /// <summary>
+        ///     Gets a chunk from this region.
         /// </summary>
         /// <param name="point">The location of the chunk.</param>
         /// <returns>An NBT file that has the </returns>
-        public  NbtFile             this        [Point point]
+        public NbtFile this[Point point]
         {
-            get
-            {
-                return this.Content[point.X + point.Y * 32];
-            }
-            set
-            {
-                InsertChunk(point, value);
-            }
+            get { return Content[point.X + point.Y * 32]; }
+            set { InsertChunk(point, value); }
         }
 
-        private                     RegionFile  ()
+        public void Dispose()
         {
-            offsets        = new Offset [1024];
-            timeStamps     = new TimeStamp [1024];
+            if (Content != null)
+                foreach (NbtFile file in Content.Where(file => file != null))
+                {
+                    file.Dispose();
+                }
+
+            Content = null;
+            offsets = null;
+            timeStamps = null;
         }
 
         /// <summary>
-        /// Inserts/replaces a new chunk on a specified location.
+        ///     Inserts/replaces a new chunk on a specified location.
         /// </summary>
         /// <param name="location">The region location of the chunk.</param>
         /// <param name="chunk">The chunk to be added.</param>
-        public  void                InsertChunk (Point location, NbtFile chunk)
+        public void InsertChunk(Point location, NbtFile chunk)
         {
             int offset = location.X + (location.Y * 32);
 
             Content[offset] = chunk;
         }
+
         /// <summary>
-        /// Removes a chunk on a specified location.
+        ///     Removes a chunk on a specified location.
         /// </summary>
         /// <param name="location">The region location of the chunk to be removed.</param>
-        public  void                RemoveChunk (Point location)
+        public void RemoveChunk(Point location)
         {
             int offset = location.X + (location.Y * 32);
 
@@ -91,191 +103,181 @@ namespace NBT
         }
 
         /// <summary>
-        /// Saves the region file to a stream.
+        ///     Saves the region file to a stream.
         /// </summary>
         /// <param name="stream">The stream the region file will write to.</param>
-        public  void                SaveRegion  (Stream stream)
+        public void SaveRegion(Stream stream)
         {
-			//using (BinaryWriter writer = new BinaryWriter(stream))
-			//{
-			//	// write header information
-			//	foreach (var offset in offsets)
-			//	{
-			//		writer.Write(EndiannessConverter.ToInt16((short) offset.SectorOffset));
-			//		writer.Write(EndiannessConverter.ToInt16(offset.SectorSize));
-			//	}
+            //using (BinaryWriter writer = new BinaryWriter(stream))
+            //{
+            //	// write header information
+            //	foreach (var offset in offsets)
+            //	{
+            //		writer.Write(EndiannessConverter.ToInt16((short) offset.SectorOffset));
+            //		writer.Write(EndiannessConverter.ToInt16(offset.SectorSize));
+            //	}
 
-			//	foreach (var timeStamp in timeStamps)
-			//	{
-			//		writer.Write(EndiannessConverter.ToInt32((int) timeStamp.Timestamp));
-			//	}
+            //	foreach (var timeStamp in timeStamps)
+            //	{
+            //		writer.Write(EndiannessConverter.ToInt32((int) timeStamp.Timestamp));
+            //	}
 
-			//	// write chunk information
-			//	foreach (var content in Content)
-			//	{
-			//		content.SaveTag(stream, 2);
-			//	}
-			//}
+            //	// write chunk information
+            //	foreach (var content in Content)
+            //	{
+            //		content.SaveTag(stream, 2);
+            //	}
+            //}
         }
 
         /// <summary>
-        /// Opens the region file from a stream.
+        ///     Opens the region file from a stream.
         /// </summary>
         /// <param name="stream">The stream the region file will read from.</param>
         /// <returns>The parsed region file.</returns>
-        public  static RegionFile   OpenRegion  (Stream stream)
+        public static RegionFile OpenRegion(Stream stream)
         {
-            RegionFile  region = new RegionFile();
+            var region = new RegionFile();
 
-            using (BinaryReader reader = new BinaryReader(stream))
-			{
-				// initialize values
-				#region Init
+            using (var reader = new BinaryReader(stream))
+            {
+                // initialize values
 
-				int[] sectors = new int[1024];
-				int[] tstamps = new int[1024];
+                #region Init
 
-				#endregion
+                var sectors = new int[1024];
+                var tstamps = new int[1024];
 
-				// read header information
-				#region Header IO read
+                #endregion
 
-				for (int i = 0; i < 1024; i++)
-					sectors[i] = reader.ReadInt32();
+                // read header information
 
-				for (int i = 0; i < 1024; i++)
-					tstamps[i] = reader.ReadInt32();
+                #region Header IO read
 
-				#endregion
+                for (int i = 0; i < 1024; i++)
+                    sectors[i] = reader.ReadInt32();
 
-				// parse header information
-				#region Offset parse
+                for (int i = 0; i < 1024; i++)
+                    tstamps[i] = reader.ReadInt32();
 
-				Thread offsetCalcThread = new Thread(() =>
-					{
-						lock (sectors)
-							for (int i = 0; i < 1024; i++)
-							{
-								int sector = EndiannessConverter.ToInt32(sectors[i]);
+                #endregion
 
-								region.offsets[i] = new Offset
-									{
-										// get the sector size of the chunk
-										SectorSize		= (byte)(sector & 0xFF),
-										// get the sector offset of the chunk
-										SectorOffset	= sector >> 8,
-									};
-							}
-					}) { Name = "offset calculator thread" };
+                // parse header information
 
-				offsetCalcThread.Start();
+                #region Offset parse
 
-				#endregion
+                var offsetCalcThread = new Thread(() =>
+                    {
+                        lock (sectors)
+                            for (int i = 0; i < 1024; i++)
+                            {
+                                int sector = EndiannessConverter.ToInt32(sectors[i]);
 
-				#region Timestamp parse
+                                region.offsets[i] = new Offset
+                                    {
+                                        // get the sector size of the chunk
+                                        SectorSize = (byte)(sector & 0xFF),
+                                        // get the sector offset of the chunk
+                                        SectorOffset = sector >> 8,
+                                    };
+                            }
+                    }) { Name = "offset calculator thread" };
 
-				Thread tstampCalcThread = new Thread(() =>
-					{
-						lock (tstamps)
-							for (int i = 0; i < 1024; i++)
-							{
-								int tstamp = EndiannessConverter.ToInt32(tstamps[i]);
+                offsetCalcThread.Start();
 
-								region.timeStamps[i] = new TimeStamp
-									{
-										Timestamp = tstamp
-									};
-							}
-					}) { Name = "timestamp calculator thread" };
+                #endregion
 
-				tstampCalcThread.Start();
+                #region Timestamp parse
 
-				#endregion
+                var tstampCalcThread = new Thread(() =>
+                    {
+                        lock (tstamps)
+                            for (int i = 0; i < 1024; i++)
+                            {
+                                int tstamp = EndiannessConverter.ToInt32(tstamps[i]);
 
-				tstampCalcThread.Join();
-				offsetCalcThread.Join();
+                                region.timeStamps[i] = new TimeStamp
+                                    {
+                                        Timestamp = tstamp
+                                    };
+                            }
+                    }) { Name = "timestamp calculator thread" };
 
-				// read content from disk
-				#region Chunk IO read
+                tstampCalcThread.Start();
 
-				byte[][] chunkBuffer = new byte[sectors.Length][];
-				{
-					for (int i = 0; i < 1024; i++)
-					{
-						Offset offset = region.offsets[i];
+                #endregion
 
-						if (offset.SectorOffset <= 0)
-							continue;
+                tstampCalcThread.Join();
+                offsetCalcThread.Join();
 
-						stream.Seek(offset.SectorOffset * 4096, SeekOrigin.Begin);
-						reader.ReadByte();
+                // read content from disk
 
-						chunkBuffer[i] = reader.ReadBytes(EndiannessConverter.ToInt32(reader.ReadInt32()) - 1);
-					}
-				}
+                #region Chunk IO read
 
-				#endregion
+                var chunkBuffer = new byte[sectors.Length][];
+                {
+                    for (int i = 0; i < 1024; i++)
+                    {
+                        Offset offset = region.offsets[i];
 
-				// parse chunk information
-				#region Parse content
+                        if (offset.SectorOffset <= 0)
+                            continue;
 
-				int				chunkSlice		= 1024 / MaxThreads;
-				Thread[]		workerThreads	= new Thread[MaxThreads];
-				List<NbtFile>	content			= new List<NbtFile>();
-				{
-					for (int i = 0; i < MaxThreads; i++)
-					{
-						int index = i;
+                        stream.Seek(offset.SectorOffset * 4096, SeekOrigin.Begin);
+                        reader.ReadByte();
 
-						workerThreads[i] = new Thread(() =>
-							{
-								List<NbtFile> buffer = new List<NbtFile>();
+                        chunkBuffer[i] = reader.ReadBytes(EndiannessConverter.ToInt32(reader.ReadInt32()) - 1);
+                    }
+                }
 
-								int offset = index * (1024 / MaxThreads);
-								for (int n = offset; n < (chunkSlice + offset); n++)
-								{
-									byte[] chunk = chunkBuffer[n];
-                                    
-									if (chunk == null)
-										continue;
+                #endregion
 
-									using (MemoryStream mmStream = new MemoryStream(chunk))
-									{
-										buffer.Add(NbtFile.OpenFile(mmStream, 2));
-									}
-								}
+                // parse chunk information
+
+                #region Parse content
+
+                var workerThreads = new Thread[MaxThreads];
+                var content = new List<NbtFile>();
+                {
+                    for (int i = 0; i < MaxThreads; i++)
+                    {
+                        int index = i;
+
+                        workerThreads[i] = new Thread(() =>
+                            {
+                                var buffer = new List<NbtFile>();
+
+                                int offset = index * (1024 / MaxThreads);
+                                for (int n = offset; n < (chunkSlice + offset); n++)
+                                {
+                                    byte[] chunk = chunkBuffer[n];
+
+                                    if (chunk == null)
+                                        continue;
+
+                                    using (var mmStream = new MemoryStream(chunk))
+                                    {
+                                        buffer.Add(NbtFile.OpenFile(mmStream, 2));
+                                    }
+                                }
 
                                 lock (content)
                                     content.AddRange(buffer);
+                            }) { Name = "Worker thread " + (i + 1) };
 
-							}) { Name = "Worker thread " + (i + 1) };
+                        workerThreads[i].Start();
+                    }
 
-						workerThreads[i].Start();
-					}
+                    foreach (Thread t in workerThreads)
+                        t.Join();
 
-					foreach (Thread t in workerThreads)
-						t.Join();
+                    region.Content = content.ToArray();
+                }
 
-					region.Content = content.ToArray();
-				}
+                #endregion
+            }
 
-				#endregion
-			}
-            
             return region;
         }
-
-	    public	void				Dispose		()
-	    {
-		    if (Content != null)
-			    foreach (var file in Content.Where(file => file != null))
-			    {
-				    file.Dispose();
-			    }
-
-		    Content		= null;
-		    offsets		= null;
-		    timeStamps	= null;
-	    }
     }
 }

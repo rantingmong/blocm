@@ -1,17 +1,14 @@
 ﻿using System;
-using System.Collections.Generic;
-
 using System.IO;
-
-using NBT;
 using System.Threading;
+using NBT;
 using NBT.Formats;
 
 namespace MCNBTtest
 {
-    class Program
+    internal class Program
     {
-        static void zeMain(string[] args)
+        private static void zeMain(string[] args)
         {
             string[] regions = Directory.GetFiles(@"D:\Minecraft\Minecraft SMP server\world_1 - Copy\region");
 
@@ -31,23 +28,23 @@ namespace MCNBTtest
             Console.ReadLine();
         }
 
-        static void Main(string[] args)
+        private static void Main(string[] args)
         {
-            NbtFile         nbtFile;
+            NbtFile nbtFile;
 
-            RegionFile      regionFile	= null;
-	        RegionFile		anvilFile	= null;
+            RegionFile regionFile = null;
+            RegionFile anvilFile = null;
 
             int choice = 3;
 
-        foo:
+            foo:
             Console.WriteLine("Hiya! This is a test application for my NBT reader, MC NBT reader.");
             Console.WriteLine("Be sure to have a .nbt and/or .mcr on your desktop or else this won't work...");
 
             Console.WriteLine("\n");
             Console.WriteLine("(1) open a NBT file");
             Console.WriteLine("(2) open a MCR file");
-			Console.WriteLine("(2) open a MCA file");
+            Console.WriteLine("(2) open a MCA file");
             Console.WriteLine("(3) say bye bye to this application");
 
             Console.Write("\nEnter choice: ");
@@ -69,17 +66,17 @@ namespace MCNBTtest
                 {
                     switch (choice)
                     {
-                        case 1:
-                            nbtFile		= NbtFile.OpenFile(File.OpenRead(Directory.GetFiles(Environment.GetFolderPath(Environment.SpecialFolder.Desktop), "*.nbt")[0]), 1);
-                            break;
-                        case 2:
-                            regionFile	= RegionFile.OpenRegion(File.OpenRead(Directory.GetFiles(Environment.GetFolderPath(Environment.SpecialFolder.Desktop), "*.mcr")[0]));
-                            break;
-                        case 3:
-							anvilFile	= RegionFile.OpenRegion(File.OpenRead(Directory.GetFiles(Environment.GetFolderPath(Environment.SpecialFolder.Desktop), "*.mca")[0]));
-                            break;
-						case 4:
-							break;
+                    case 1:
+                        nbtFile = NbtFile.OpenFile(File.OpenRead(Directory.GetFiles(Environment.GetFolderPath(Environment.SpecialFolder.Desktop), "*.nbt")[0]), 1);
+                        break;
+                    case 2:
+                        regionFile = RegionFile.OpenRegion(File.OpenRead(Directory.GetFiles(Environment.GetFolderPath(Environment.SpecialFolder.Desktop), "*.mcr")[0]));
+                        break;
+                    case 3:
+                        anvilFile = RegionFile.OpenRegion(File.OpenRead(Directory.GetFiles(Environment.GetFolderPath(Environment.SpecialFolder.Desktop), "*.mca")[0]));
+                        break;
+                    case 4:
+                        break;
                     }
                 }
                 catch (Exception ex)
@@ -88,19 +85,19 @@ namespace MCNBTtest
                 }
             }
 
-			Console.WriteLine("parse complete!");
+            Console.WriteLine("parse complete!");
 
-	        foreach (var file in anvilFile.Content)
-	        {
-		        if (file != null)
-		        {
-			        Anvil anvil = new Anvil(file);
+            foreach (NbtFile file in anvilFile.Content)
+            {
+                if (file != null)
+                {
+                    var anvil = new Anvil(file);
 
-			        Console.WriteLine(anvil.XPos + " " + anvil.ZPos);
-		        }
-	        }
-			
-			Console.WriteLine(anvilFile.Content.Length);
+                    Console.WriteLine(anvil.XPos + " " + anvil.ZPos);
+                }
+            }
+
+            Console.WriteLine(anvilFile.Content.Length);
 
             Console.ReadLine();
         }

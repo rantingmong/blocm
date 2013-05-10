@@ -1,4 +1,4 @@
-﻿﻿/*  Minecraft NBT reader
+﻿/*  Minecraft NBT reader
  * 
  *  Copyright 2010-2013 Michael Ong, all rights reserved.
  *  
@@ -16,26 +16,29 @@
  *  along with this program; if not, write to the Free Software
  *  Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
+
 using System;
 
 namespace NBT.Utils
 {
     /// <summary>
-    /// Provides helper methods to convert between byte endianness.
+    ///     Provides helper methods to convert between byte endianness.
     /// </summary>
     public static class EndiannessConverter
     {
-        public static short     ToInt16     (short value)
+        public static short ToInt16(short value)
         {
             return (short)((value >> 8) | ((value << 8) & 0xFF));
         }
-        public static int       ToInt32     (int value)
+
+        public static int ToInt32(int value)
         {
-            value = (int)((value << 8) & 0xFF00FF00) | (int)((value >> 8) & 0xFF00FF);
+            value = (int)((value << 8) & 0xFF00FF00) | ((value >> 8) & 0xFF00FF);
 
             return (value << 16) | ((value >> 16) & 0xFFFF);
         }
-        public static long      ToInt64     (long value)
+
+        public static long ToInt64(long value)
         {
             byte[] reverse = BitConverter.GetBytes(value);
             Array.Reverse(reverse);
@@ -43,14 +46,15 @@ namespace NBT.Utils
             return BitConverter.ToInt64(reverse, 0);
         }
 
-        public static float     ToSingle    (float value)
+        public static float ToSingle(float value)
         {
             byte[] reverse = BitConverter.GetBytes(value);
             Array.Reverse(reverse);
 
             return BitConverter.ToSingle(reverse, 0);
         }
-        public static double    ToDouble    (double value)
+
+        public static double ToDouble(double value)
         {
             byte[] reverse = BitConverter.GetBytes(value);
             Array.Reverse(reverse);

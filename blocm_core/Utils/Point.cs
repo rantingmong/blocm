@@ -1,4 +1,4 @@
-﻿﻿/*  Minecraft NBT reader
+﻿/*  Minecraft NBT reader
  * 
  *  Copyright 2010-2013 Michael Ong, all rights reserved.
  *  
@@ -20,29 +20,29 @@
 namespace NBT.Utils
 {
     /// <summary>
-    /// Defines a chunk point in a region file.
+    ///     Defines a chunk point in a region file.
     /// </summary>
     public struct Point
     {
-	    /// <summary>
-	    /// The x-location of the chunk.
-	    /// </summary>
-	    public int	X		{ get; set; }
-
-	    /// <summary>
-	    /// The y-location of the chunk.
-	    /// </summary>
-	    public int	Y		{ get; set; }
-
-	    /// <summary>
-        /// Creates a new point.
+        /// <summary>
+        ///     Creates a new point.
         /// </summary>
         /// <param name="x">The x-location.</param>
         /// <param name="y">The y-location.</param>
-        public		Point	(int x, int y) : this()
+        public Point(int x, int y) : this()
         {
             X = x;
             Y = y;
         }
+
+        /// <summary>
+        ///     The x-location of the chunk.
+        /// </summary>
+        public int X { get; set; }
+
+        /// <summary>
+        ///     The y-location of the chunk.
+        /// </summary>
+        public int Y { get; set; }
     }
 }

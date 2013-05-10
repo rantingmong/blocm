@@ -1,11 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-
-namespace NBT.Formats
+﻿namespace NBT.Formats
 {
-	class Schematic
-	{
-	}
+    internal class Schematic
+    {
+    }
 }
