@@ -19,9 +19,30 @@
 
 using System;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace NBT
 {
+    /// <summary>
+    /// NBT tag types.
+    /// </summary>
+    public enum  NbtTagType
+    {
+        Invalid = -1,
+        End = 0,
+        Byte = 1,
+        Short = 2,
+        Int = 3,
+        Long = 4,
+        Float = 5,
+        Double = 6,
+        ByteArray = 7,
+        String = 8,
+        List = 9,
+        Compound = 10,
+        IntArray = 11
+    }
+
     /// <summary>
     ///     A NBT tag, the building blocks of a NBT file.
     /// </summary>
@@ -33,72 +54,69 @@ namespace NBT
         /// <param name="name">The name of the tag.</param>
         /// <param name="type">The type of the tag.</param>
         /// <param name="payload">The payload of the tag.</param>
-        public NbtTag(string name, byte type, dynamic payload) : this()
+        public NbtTag(string name, NbtTagType type, object payload) : this()
         {
-            bool error = false;
+            Payload = payload;
+            Name = name;
+            Type = type;
+
+            var error = false;
 
             switch (type)
             {
-            case 1:
-                if (!(payload is byte))
+            case NbtTagType.End:
+                if (payload.GetType() != typeof (byte) && (byte)payload != 0)
                     error = true;
                 break;
-            case 2:
-                if (!(payload is short))
+            case NbtTagType.Byte:
+                if (payload.GetType() != typeof (byte))
                     error = true;
                 break;
-            case 3:
-                if (!(payload is int))
+            case NbtTagType.Short:
+                if (payload.GetType() != typeof (short))
                     error = true;
                 break;
-            case 4:
-                if (!(payload is long))
+            case NbtTagType.Int:
+                if (payload.GetType() != typeof (int))
                     error = true;
                 break;
-            case 5:
-                if (!(payload is float))
+            case NbtTagType.Long:
+                if (payload.GetType() != typeof (long))
                     error = true;
                 break;
-            case 6:
-                if (!(payload is double))
+            case NbtTagType.Float:
+                if (payload.GetType() != typeof (float))
                     error = true;
                 break;
-            case 7:
-                if (!(payload is byte[]))
+            case NbtTagType.Double:
+                if (payload.GetType() != typeof (double))
                     error = true;
                 break;
-            case 8:
-                if (!(payload is string))
+            case NbtTagType.ByteArray:
+                if (payload.GetType() != typeof (byte[]))
                     error = true;
                 break;
-            case 9:
-                if (!(payload is List<NbtTag>))
+            case NbtTagType.String:
+                if (payload.GetType() != typeof (string))
                     error = true;
                 break;
-            case 10:
-                if (!(payload is Dictionary<string, NbtTag>))
+            case NbtTagType.List:
+                if (payload.GetType() != typeof (List<NbtTag>))
+                    error = true;
+                break;
+            case NbtTagType.Compound:
+                if (payload.GetType() != typeof (Dictionary<string, NbtTag>))
+                    error = true;
+                break;
+            case NbtTagType.IntArray:
+                if (payload.GetType() != typeof (int[]))
                     error = true;
                 break;
             }
 
             if (error)
-                throw new InvalidCastException("Wrong type used on tag payload!");
-
-            Payload = payload;
-
-            Type = type;
-            Name = name;
+                throw new InvalidOperationException("NBT type differs from NBT payload.");
         }
-
-        /// <summary>
-        ///     The payload of this tag.
-        /// </summary>
-        public dynamic Payload { get; private set; }
-
-        /// <summary>
-        ///     The tag type of this tag.
-        /// </summary>
-        public byte Type { get; private set; }
 
         /// <summary>
         ///     The name of this tag.
@@ -106,28 +124,59 @@ namespace NBT
         public string Name { get; private set; }
 
         /// <summary>
+        ///     The tag type of this tag.
+        /// </summary>
+        public NbtTagType Type { get; private set; }
+
+        /// <summary>
+        ///     The payload of this tag.
+        /// </summary>
+        public object Payload { get; private set; }
+
+        /// <summary>
         ///     Converts this tag to a human readable string.
         /// </summary>
         /// <returns></returns>
         public override string ToString()
         {
-            string payloadValue = Payload.ToString();
+            return string.Empty;
+        }
 
-            if (Payload is List<NbtTag> || Payload is Dictionary<string, NbtTag>)
+        /// <summary>
+        /// Gets the size of this tag.
+        /// </summary>
+        /// <returns>The tag size in bytes.</returns>
+        public int Size()
+        {
+            switch (Type)
             {
-                if (Payload is List<NbtTag>)
-                {
-                    payloadValue = "list ";
-                }
-                else
-                {
-                    payloadValue = "cmpd ";
-                }
-
-                payloadValue += "items: " + Payload.Count;
+            case NbtTagType.End:
+                return 1;
+            case NbtTagType.Byte:
+                return 1;
+            case NbtTagType.Short:
+                return 2;
+            case NbtTagType.Int:
+                return 4;
+            case NbtTagType.Long:
+                return 8;
+            case NbtTagType.Float:
+                return 4;
+            case NbtTagType.Double:
+                return 8;
+            case NbtTagType.ByteArray:
+                return ((byte[])Payload).Length;
+            case NbtTagType.String:
+                return ((string)Payload).Length * 2;
+            case NbtTagType.List:
+                return ((List<NbtTag>)Payload).Sum(tag => tag.Size());
+            case NbtTagType.Compound:
+                return ((Dictionary<string, NbtTag>)Payload).Sum(tag => tag.Value.Size());
+            case NbtTagType.IntArray:
+                return ((int[])Payload).Length * 4;
             }
 
-            return string.Format("name: {0}, value: {1}", Name, payloadValue);
+            throw new InvalidOperationException("Cannot get size of invalid tag type.");
         }
     }
 }

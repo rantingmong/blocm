@@ -67,7 +67,7 @@ namespace MCNBTtest
                     switch (choice)
                     {
                     case 1:
-                        nbtFile = NbtFile.OpenFile(File.OpenRead(Directory.GetFiles(Environment.GetFolderPath(Environment.SpecialFolder.Desktop), "*.nbt")[0]), 1);
+                        nbtFile = NbtFile.OpenTag(File.OpenRead(Directory.GetFiles(Environment.GetFolderPath(Environment.SpecialFolder.Desktop), "*.nbt")[0]), 1);
                         break;
                     case 2:
                         regionFile = RegionFile.OpenRegion(File.OpenRead(Directory.GetFiles(Environment.GetFolderPath(Environment.SpecialFolder.Desktop), "*.mcr")[0]));

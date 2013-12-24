@@ -7,38 +7,36 @@ namespace NBT.Formats
         public Anvil(NbtFile input)
             : this()
         {
-            Entities = input["Level"].Payload["Entities"].Payload;
-            TileEntities = input["Level"].Payload["TileEntities"].Payload;
+            var payload = (Dictionary<string, NbtTag>)input["Level"].Payload;
 
-            Biomes = input["Level"].Payload["Biomes"].Payload;
-
-            LastUpdate = input["Level"].Payload["LastUpdate"].Payload;
-
-            XPos = input["Level"].Payload["xPos"].Payload;
-            ZPos = input["Level"].Payload["zPos"].Payload;
-
-            TerrainPopulated = input["Level"].Payload["TerrainPopulated"].Payload;
-
-            HeightMap = input["Level"].Payload["HeightMap"].Payload;
-
+            Entities = (List<NbtTag>)payload["Entities"].Payload;
+            TileEntities = (List<NbtTag>)payload["TileEntities"].Payload;
+            Biomes = (byte[])payload["Biomes"].Payload;
+            LastUpdate = (long)payload["LastUpdate"].Payload;
+            XPos = (int)payload["xPos"].Payload;
+            ZPos = (int)payload["zPos"].Payload;
+            TerrainPopulated = (byte)payload["TerrainPopulated"].Payload;
+            HeightMap = (int[])payload["HeightMap"].Payload;
             Sections = new List<AnvilSection>();
 
-            foreach (NbtTag section in input["Level"].Payload["Sections"].Payload)
+            foreach (var section in (List<NbtTag>)payload["Sections"].Payload)
             {
+                var content = (Dictionary<string, NbtTag>)section.Payload;
+
                 var anvilSection = new AnvilSection
                     {
                         Data = new byte[4096],
                         SkyLight = new byte[4096],
                         BlockLight = new byte[4096],
-                        Y = section.Payload["Y"].Payload,
-                        Blocks = section.Payload["Blocks"].Payload,
+                        Y = (byte)content["Y"].Payload,
+                        Blocks = (byte[])content["Blocks"].Payload,
                     };
 
-                byte[] aData = section.Payload["Data"].Payload;
-                byte[] sData = section.Payload["SkyLight"].Payload;
-                byte[] bData = section.Payload["BlockLight"].Payload;
+                var aData = (byte[])content["Data"].Payload;
+                var sData = (byte[])content["SkyLight"].Payload;
+                var bData = (byte[])content["BlockLight"].Payload;
 
-                int index = 0;
+                var index = 0;
 
                 for (int i = 0; i < 2048; i++)
                 {

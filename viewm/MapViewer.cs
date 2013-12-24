@@ -9,10 +9,10 @@ namespace viewm
 {
     public partial class MapViewer : Panel
     {
-        private D2D.Factory factory;
+        private D2D.Factory             factory;
 
-        private D2D.Bitmap inputBitmap;
-        private D2D.WindowRenderTarget windowRenderTarget;
+        private D2D.Bitmap              inputBitmap;
+        private D2D.WindowRenderTarget  windowRenderTarget;
 
         public MapViewer()
         {
@@ -57,11 +57,6 @@ namespace viewm
                 windowRenderTarget.BeginDraw();
 
                 windowRenderTarget.Clear(Color.DimGray);
-
-                if (inputBitmap != null)
-                {
-                    windowRenderTarget.DrawBitmap(inputBitmap, 1, D2D.BitmapInterpolationMode.Linear);
-                }
 
                 windowRenderTarget.EndDraw();
             }

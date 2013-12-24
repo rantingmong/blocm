@@ -18,6 +18,7 @@
  */
 
 using System;
+using System.Linq;
 using System.Collections;
 using System.Collections.Generic;
 using System.IO;
@@ -42,8 +43,6 @@ namespace NBT
 
             NamedNbt = false;
             RootName = "";
-
-            CollectionCount = 0;
         }
 
         /// <summary>
@@ -55,6 +54,9 @@ namespace NBT
         {
             NamedNbt = named;
             RootName = rootname;
+
+            list = new List<NbtTag>();
+            dict = new Dictionary<string, NbtTag>();
         }
 
         /// <summary>
@@ -80,11 +82,6 @@ namespace NBT
         ///     Gets the root name of this NBT file.
         /// </summary>
         public string RootName { get; private set; }
-
-        /// <summary>
-        ///     Returns the total number of elements the root list have.
-        /// </summary>
-        public int CollectionCount { get; private set; }
 
         /// <summary>
         ///     Gets a NBT tag on a specified index (TAG_LIST only).
@@ -156,69 +153,12 @@ namespace NBT
         }
 
         /// <summary>
-        ///     Saves this NBT file in a stream.
+        /// Gets the size of this NBT file.
         /// </summary>
-        /// <param name="stream">The output stream this NBT file will write onto.</param>
-        /// <param name="version">The compression version of the NBT, specify '1' for the original gzip compression, '2' for the mcregion zlib compression.</param>
-        public void SaveTag(Stream stream, int version)
+        /// <returns>The size of the NBT file in bytes.</returns>
+        public int Size()
         {
-            Stream compressStream;
-
-            if (version == 1)
-            {
-                compressStream = new GZipStream(stream, CompressionMode.Compress);
-            }
-            else
-            {
-                stream.WriteByte(0);
-                stream.WriteByte(0);
-
-                compressStream = new DeflateStream(stream, CompressionMode.Compress);
-            }
-
-            var writer = new BinaryWriter(compressStream);
-            {
-                writer.Write((byte)(NamedNbt ? 10 : 9));
-                writer.Write(EndiannessConverter.ToInt16((short)RootName.Length));
-
-                byte[] oString = Encoding.UTF8.GetBytes(RootName);
-
-                foreach (byte t in oString)
-                {
-                    writer.Write(t);
-                }
-
-                if (NamedNbt)
-                {
-                    foreach (var tag in dict)
-                    {
-                        writer.Write(tag.Value.Type);
-                        writer.Write(EndiannessConverter.ToInt16((short)tag.Value.Name.Length));
-
-                        oString = Encoding.UTF8.GetBytes(tag.Value.Name);
-
-                        foreach (byte t in oString)
-                        {
-                            writer.Write(t);
-                        }
-
-                        SavePayload(ref writer, tag.Value.Type, tag.Value.Payload);
-                    }
-                    writer.Write((byte)0);
-                }
-                else
-                {
-                    writer.Write(list[0].Type);
-                    writer.Write(EndiannessConverter.ToInt32(list.Count));
-
-                    foreach (NbtTag t in list)
-                    {
-                        SavePayload(ref writer, list[0].Type, t.Payload);
-                    }
-                }
-            }
-            writer.Dispose();
-            compressStream.Dispose();
+            return NamedNbt ? dict.Sum(tag => tag.Value.Size()) : list.Sum(tag => tag.Size());
         }
 
         /// <summary>
@@ -227,7 +167,7 @@ namespace NBT
         /// <param name="stream">The stream to get the NBT file from.</param>
         /// <param name="version">The compression version of the NBT, specify '1' for the original gzip compression, '2' for the mcregion zlib compression.</param>
         /// <returns>An opened NBT file.</returns>
-        public static NbtFile OpenFile(Stream stream, int version)
+        public static NbtFile OpenTag(Stream stream, int version)
         {
             var file = new NbtFile();
 
@@ -258,21 +198,17 @@ namespace NBT
 
                     while ((type = reader.ReadByte()) != 0)
                     {
-                        file.InsertTag(
-                            new NbtTag(
-                                textEncoding.GetString(reader.ReadBytes(EndiannessConverter.ToInt16(reader.ReadInt16()))),
-                                type,
-                                file.ReadPayload(ref reader, type)));
+                        file.InsertTag(new NbtTag(textEncoding.GetString(reader.ReadBytes(EndiannessConverter.ToInt16(reader.ReadInt16()))), (NbtTagType)type, ReadPayload(ref reader, type)));
                     }
                 }
                 else
                 {
-                    byte type = reader.ReadByte();
-                    int size = EndiannessConverter.ToInt32(reader.ReadInt32());
+                    var type = reader.ReadByte();
+                    var size = EndiannessConverter.ToInt32(reader.ReadInt32());
 
                     for (int i = 0; i < size; i++)
                     {
-                        file.InsertTag(new NbtTag("", type, file.ReadPayload(ref reader, type)));
+                        file.InsertTag(new NbtTag("", (NbtTagType)type, ReadPayload(ref reader, type)));
                     }
                 }
             }
@@ -283,7 +219,74 @@ namespace NBT
             return file;
         }
 
-        private dynamic ReadPayload(ref BinaryReader reader, byte type)
+        /// <summary>
+        ///     Saves this NBT file to a stream.
+        /// </summary>
+        /// <param name="stream">The output stream this NBT file will write onto.</param>
+        /// <param name="version">The compression version of the NBT, specify '1' for the original gzip compression, '2' for the mcregion zlib compression.</param>
+        /// <param name="file">The NBT file to save</param>
+        public static void SaveTag(Stream stream, int version, NbtFile file)
+        {
+            Stream compressStream;
+
+            if (version == 1)
+            {
+                compressStream = new GZipStream(stream, CompressionMode.Compress);
+            }
+            else
+            {
+                stream.WriteByte(0);
+                stream.WriteByte(0);
+
+                compressStream = new DeflateStream(stream, CompressionMode.Compress);
+            }
+
+            var writer = new BinaryWriter(compressStream);
+            {
+                writer.Write((byte)(file.NamedNbt ? 10 : 9));
+                writer.Write(EndiannessConverter.ToInt16((short)file.RootName.Length));
+
+                byte[] oString = Encoding.UTF8.GetBytes(file.RootName);
+
+                foreach (byte t in oString)
+                {
+                    writer.Write(t);
+                }
+
+                if (file.NamedNbt)
+                {
+                    foreach (var tag in file.dict)
+                    {
+                        writer.Write((byte)tag.Value.Type);
+                        writer.Write(EndiannessConverter.ToInt16((short)tag.Value.Name.Length));
+
+                        oString = Encoding.UTF8.GetBytes(tag.Value.Name);
+
+                        foreach (byte t in oString)
+                        {
+                            writer.Write(t);
+                        }
+
+                        SavePayload(ref writer, tag.Value.Type, tag.Value.Payload);
+                    }
+                    writer.Write((byte)0);
+                }
+                else
+                {
+                    writer.Write((byte)file.list[0].Type);
+                    writer.Write(EndiannessConverter.ToInt32(file.list.Count));
+
+                    foreach (NbtTag t in file.list)
+                    {
+                        SavePayload(ref writer, file.list[0].Type, t.Payload);
+                    }
+                }
+            }
+            writer.Dispose();
+            compressStream.Dispose();
+        }
+
+        private static object ReadPayload(ref BinaryReader reader, byte type)
         {
             switch (type)
             {
@@ -313,7 +316,7 @@ namespace NBT
                         int containerSize = EndiannessConverter.ToInt32(reader.ReadInt32());
 
                         for (int i = 0; i < containerSize; i++)
-                            ret.Add(new NbtTag("", containerType, ReadPayload(ref reader, containerType)));
+                            ret.Add(new NbtTag("", (NbtTagType)containerType, ReadPayload(ref reader, containerType)));
                     }
                     return ret;
                 }
@@ -325,10 +328,8 @@ namespace NBT
 
                         while ((containerType = reader.ReadByte()) != 0)
                         {
-                            string containerName =
-                                Encoding.UTF8.GetString(reader.ReadBytes(EndiannessConverter.ToInt16(reader.ReadInt16())));
-
-                            dic.Add(containerName, new NbtTag(containerName, containerType, ReadPayload(ref reader, containerType)));
+                            string containerName = Encoding.UTF8.GetString(reader.ReadBytes(EndiannessConverter.ToInt16(reader.ReadInt16())));
+                            dic.Add(containerName, new NbtTag(containerName, (NbtTagType)containerType, ReadPayload(ref reader, containerType)));
                         }
                     }
                     return dic;
@@ -348,79 +349,84 @@ namespace NBT
                 throw new NotSupportedException("Tag type is invalid!");
             }
         }
-
-        private void SavePayload(ref BinaryWriter writer, byte type, dynamic payload)
+        
+        private static void SavePayload(ref BinaryWriter writer, NbtTagType type, object payload)
         {
             switch (type)
             {
-            case 0:
+            case NbtTagType.End:
                 writer.Write((byte)0);
                 break;
-            case 1:
+            case NbtTagType.Byte:
                 writer.Write((byte)payload);
                 break;
-            case 2:
-                writer.Write(EndiannessConverter.ToInt16(payload));
+            case NbtTagType.Short:
+                writer.Write(EndiannessConverter.ToInt16((short)payload));
                 break;
-            case 3:
-                writer.Write(EndiannessConverter.ToInt32(payload));
+            case NbtTagType.Int:
+                writer.Write(EndiannessConverter.ToInt32((int)payload));
                 break;
-            case 4:
-                writer.Write(EndiannessConverter.ToInt64(payload));
+            case NbtTagType.Long:
+                writer.Write(EndiannessConverter.ToInt64((long)payload));
                 break;
-            case 5:
-                writer.Write(EndiannessConverter.ToSingle(payload));
+            case NbtTagType.Float:
+                writer.Write(EndiannessConverter.ToSingle((float)payload));
                 break;
-            case 6:
-                writer.Write(EndiannessConverter.ToDouble(payload));
+            case NbtTagType.Double:
+                writer.Write(EndiannessConverter.ToDouble((double)payload));
                 break;
-            case 7:
-                writer.Write(EndiannessConverter.ToInt32(payload.Length));
-
-                for (int i = 0; i < payload.Length; i++)
+            case NbtTagType.ByteArray:
                 {
-                    writer.Write(payload[i]);
-                }
-                break;
-            case 8:
-                writer.Write(EndiannessConverter.ToInt16((short)payload.Length));
+                    var pload = (int[])payload;
 
-                byte[] oString = Encoding.UTF8.GetBytes(payload);
+                    writer.Write(EndiannessConverter.ToInt32(pload.Length));
 
-                foreach (byte t in oString)
-                {
-                    writer.Write(t);
-                }
-                break;
-            case 9:
-
-                writer.Write(payload[0].Type);
-                writer.Write(EndiannessConverter.ToInt32(payload.Count));
-
-                foreach (NbtTag tag in payload)
-                {
-                    SavePayload(ref writer, tag.Type, tag.Payload);
-                }
-
-                break;
-            case 10:
-
-                foreach (KeyValuePair<string, NbtTag> tag in payload)
-                {
-                    writer.Write(tag.Value.Type);
-                    writer.Write(EndiannessConverter.ToInt16((short)tag.Key.Length));
-
-                    byte[] cString = Encoding.UTF8.GetBytes(tag.Key);
-
-                    foreach (byte t in cString)
+                    foreach (var t in pload)
                     {
                         writer.Write(t);
                     }
-
-                    SavePayload(ref writer, tag.Value.Type, tag.Value.Payload);
                 }
-                writer.Write((byte)0);
+                break;
+            case NbtTagType.String:
+                {
+                    var pload = (string)payload;
 
+                    writer.Write(EndiannessConverter.ToInt16((short)pload.Length));
+
+                    var oString = Encoding.UTF8.GetBytes(pload);
+                    foreach (var t in oString)
+                    {
+                        writer.Write(t);
+                    }
+                }
+                break;
+            case NbtTagType.List:
+                {
+                    var pload = (List<NbtTag>)payload;
+
+                    writer.Write((byte)pload[0].Type);
+                    writer.Write(EndiannessConverter.ToInt32(pload.Count));
+
+                    foreach (var tag in pload)
+                    {
+                        SavePayload(ref writer, tag.Type, tag.Payload);
+                    }
+                }
+                break;
+            case NbtTagType.Compound:
+                {
+                    foreach (var tag in (Dictionary<string, NbtTag>)payload)
+                    {
+                        writer.Write((byte)tag.Value.Type);
+
+                        SavePayload(ref writer, NbtTagType.String, tag.Key);
+                        SavePayload(ref writer, tag.Value.Type, tag.Value.Payload);
+                    }
+                    
+                    SavePayload(ref writer, NbtTagType.End, null);
+                }
+                break;
+            case NbtTagType.IntArray:
                 break;
             }
         }

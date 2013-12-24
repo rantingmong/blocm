@@ -33,9 +33,7 @@ namespace viewm
                 contextMenuOpenWorld.Items.Add(menuItemHeader);
                 contextMenuOpenWorld.Items.Add(new ToolStripSeparator());
 
-                foreach (
-                    ToolStripMenuItem item in
-                        directories.Select(directory => new ToolStripMenuItem(Path.GetFileName(directory))))
+                foreach (ToolStripMenuItem item in directories.Select(directory => new ToolStripMenuItem(Path.GetFileName(directory))))
                 {
                     int index = i++;
 
@@ -69,8 +67,8 @@ namespace viewm
                                                 {
                                                     labelStatus.Text = "Process completed in " + (eTime - sTime).TotalSeconds + " seconds.";
 
-                                                    // mapViewer.InputBitmap = chunkProcessor.ResultingBitmap;
-                                                    buttonOpen.Enabled = true;
+                                                    mapViewer.InputBitmap   = null;
+                                                    buttonOpen.Enabled      = true;
                                                 }));
                                         };
 

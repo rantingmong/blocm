@@ -18,46 +18,44 @@ namespace viewm.Renderer
 {
     public struct ChunkEntry
     {
-        public int XPos { get; set; }
-        public int ZPos { get; set; }
+        public int      XPos            { get; set; }
+        public int      ZPos            { get; set; }
 
-        public Bitmap RenderedChunk { get; set; }
+        public Bitmap   RenderedChunk   { get; set; }
     }
 
     public struct RegionEntry
     {
-        public int XPos { get; set; }
-        public int ZPos { get; set; }
+        public int      XPos            { get; set; }
+        public int      ZPos            { get; set; }
 
-        public Bitmap RenderedRegion { get; set; }
+        public Bitmap   RenderedRegion  { get; set; }
     }
 
     public class WorldProcessor
     {
-        public static int BLOCK_SIZE = 1;
+        public static int               BLOCK_SIZE      = 1;
 
-        private readonly string worldLocation = "";
+        private readonly string         worldLocation   = "";
 
-        private SolidColorBrush heightmapBrush;
-        private Blocks theBlocks;
+        private SolidColorBrush         heightmapBrush;
+        private Blocks                  theBlocks;
 
-        public WorldProcessor(string worldLocation)
+        public event Action<string>     ProcessFailed;
+        public event Action             ProcessStarted;
+        public event Action             ProcessComplete;
+
+        public event Action<RegionFile> RegionLoaded;
+        public event Action             RegionRendered;
+
+        public event Action<float>      ProgressChanged;
+
+        public                          WorldProcessor  (string worldLocation)
         {
             this.worldLocation = worldLocation;
         }
 
-        public Bitmap ResultingBitmap { get; private set; }
-
-        public event Action<string> ProcessFailed;
-        public event Action ProcessStarted;
-        public event Action ProcessComplete;
-
-        public event Action<RegionFile> RegionLoaded;
-        public event Action RegionRendered;
-
-        public event Action<float> ProgressChanged;
-
-        public void Start()
+        public void                     Start           ()
         {
             if (ProcessStarted != null)
                 ProcessStarted();
@@ -68,8 +66,8 @@ namespace viewm.Renderer
             theBlocks = new Blocks(rendererUtil.D2DDeviceContext);
 
             // obtain file list
-            List<string> regionList = Directory.GetFiles(Path.Combine(worldLocation, "region"), "*.mca").ToList();
-            var regionEntries = new List<RegionEntry>();
+            var regionList      = Directory.GetFiles(Path.Combine(worldLocation, "region"), "*.mca").ToList();
+            var regionEntries   = new List<RegionEntry>();
 
             foreach (string region in regionList)
             {
@@ -89,11 +87,11 @@ namespace viewm.Renderer
 
                         #region Chunk render
 
-                        foreach (NbtFile chunk in regionFile.Content)
+                        foreach (var anvilChunk in regionFile.Content.Select(chunk => new Anvil(chunk)))
                         {
                             ChunkEntry entry;
-                            RenderSegment(new Anvil(chunk), rendererUtil.D2DDeviceContext, out entry);
-
+                            RenderSegment(anvilChunk, rendererUtil.D2DDeviceContext, out entry);
+                            
                             renderedChunks.Add(entry);
                         }
 
@@ -200,12 +198,12 @@ namespace viewm.Renderer
 
             #region World compositor
 
-            ResultingBitmap = new Bitmap1(rendererUtil.D2DDeviceContext,
-                                          new DrawingSize(wSizeX, wSizeZ),
-                                          new BitmapProperties1
+            var ResultingBitmap = new Bitmap1(rendererUtil.D2DDeviceContext,
+                                              new DrawingSize(wSizeX, wSizeZ),
+                                              new BitmapProperties1
                                               {
                                                   BitmapOptions = BitmapOptions.Target,
-                                                  PixelFormat = new PixelFormat(Format.R8G8B8A8_UNorm, AlphaMode.Premultiplied)
+                                                  PixelFormat   = new PixelFormat(Format.R8G8B8A8_UNorm, AlphaMode.Premultiplied)
                                               });
 
             rendererUtil.D2DDeviceContext.Target = ResultingBitmap;
@@ -265,13 +263,15 @@ namespace viewm.Renderer
             rendererUtil.Dispose();
             theBlocks.Dispose();
 
+            ResultingBitmap.Dispose();
+
             #endregion
 
             if (ProcessComplete != null)
                 ProcessComplete();
         }
 
-        public void RenderSegment(Anvil anvil, RenderTarget renderTarget, out ChunkEntry output)
+        public void                     RenderSegment   (Anvil anvil, RenderTarget renderTarget, out ChunkEntry output)
         {
             if (heightmapBrush == null)
                 heightmapBrush = new SolidColorBrush(renderTarget, Color.Black);
