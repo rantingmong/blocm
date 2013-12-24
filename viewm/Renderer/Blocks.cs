@@ -1,42 +1,43 @@
 ﻿using System;
 using System.Collections.Generic;
+
 using SharpDX;
-using SharpDX.Direct2D1;
 
 namespace viewm.Renderer
 {
     public class Blocks : IDisposable
     {
-        public Dictionary<byte, SolidColorBrush> BlockList = new Dictionary<byte, SolidColorBrush>();
+        public Dictionary<byte, byte[]> BlockList = new Dictionary<byte, byte[]>();
 
-        public Blocks(RenderTarget renderTarget)
+        public Blocks()
         {
-            BlockList.Add(0,    new SolidColorBrush(renderTarget, Color.Transparent));
-            BlockList.Add(1,    new SolidColorBrush(renderTarget, Color.DimGray));
-            BlockList.Add(2,    new SolidColorBrush(renderTarget, Color.ForestGreen));
-            BlockList.Add(3,    new SolidColorBrush(renderTarget, new Color(185, 122, 87, 255)));
-            BlockList.Add(4,    new SolidColorBrush(renderTarget, Color.Gray));
-            BlockList.Add(5,    new SolidColorBrush(renderTarget, Color.SandyBrown));
-            BlockList.Add(7,    new SolidColorBrush(renderTarget, Color.Black));
-            BlockList.Add(8,    new SolidColorBrush(renderTarget, new Color(0, 162, 232, 255)) { Opacity = 0.35f });
-            BlockList.Add(9,    new SolidColorBrush(renderTarget, new Color(0, 162, 232, 255)) { Opacity = 0.35f });
-            BlockList.Add(10,   new SolidColorBrush(renderTarget, Color.DarkOrange) { Opacity = 0.35f });
-            BlockList.Add(11,   new SolidColorBrush(renderTarget, Color.DarkOrange) { Opacity = 0.35f });
-            BlockList.Add(12,   new SolidColorBrush(renderTarget, Color.LightYellow));
-            BlockList.Add(13,   new SolidColorBrush(renderTarget, Color.PaleVioletRed));
-            BlockList.Add(14,   new SolidColorBrush(renderTarget, Color.Gold));
-            BlockList.Add(15,   new SolidColorBrush(renderTarget, Color.Silver));
-            BlockList.Add(16,   new SolidColorBrush(renderTarget, Color.DimGray));
-            BlockList.Add(17,   new SolidColorBrush(renderTarget, Color.SaddleBrown));
-            BlockList.Add(18,   new SolidColorBrush(renderTarget, Color.DarkGreen) { Opacity = 0.25f });
+            // TODO: DON'T USE DIRECT2D COLORS
+
+            var hehe = Color.ForestGreen.ToArray();
+
+            BlockList.Add(0,    new byte[] { 0, 0, 0, 0 });
+            BlockList.Add(1,    Color.DimGray.ToArray());
+            BlockList.Add(2,    Color.ForestGreen.ToArray());
+            BlockList.Add(3,    new byte[] { 185, 122, 87, 255});
+            BlockList.Add(4,    Color.Gray.ToArray());
+            BlockList.Add(5,    Color.SandyBrown.ToArray());
+            BlockList.Add(7,    Color.Black.ToArray());
+            BlockList.Add(8,    new byte[] { 0, 162, 232, 90 });
+            BlockList.Add(9,    new byte[] { 0, 162, 232, 90 });
+            BlockList.Add(10,   new byte[] { Color.DarkOrange.R, Color.DarkOrange.G, Color.DarkOrange.B, 90 });
+            BlockList.Add(11,   new byte[] { Color.DarkOrange.R, Color.DarkOrange.G, Color.DarkOrange.B, 90 });
+            BlockList.Add(12,   Color.LightYellow.ToArray());
+            BlockList.Add(13,   Color.PaleVioletRed.ToArray());
+            BlockList.Add(14,   Color.Gold.ToArray());
+            BlockList.Add(15,   Color.Silver.ToArray());
+            BlockList.Add(16,   Color.DimGray.ToArray());
+            BlockList.Add(17,   Color.SaddleBrown.ToArray());
+            BlockList.Add(18,   new byte[] { Color.DarkGreen.R, Color.DarkGreen.G, Color.DarkGreen.B, 64 });
         }
 
         public void Dispose()
         {
-            foreach (var solidColorBrush in BlockList)
-            {
-                solidColorBrush.Value.Dispose();
-            }
+
         }
     }
 }

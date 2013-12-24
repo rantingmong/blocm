@@ -34,13 +34,6 @@ namespace viewm.Renderer
 
     public class WorldProcessor
     {
-        public static int               BLOCK_SIZE      = 1;
-
-        private readonly string         worldLocation   = "";
-
-        private SolidColorBrush         heightmapBrush;
-        private Blocks                  theBlocks;
-
         public event Action<string>     ProcessFailed;
         public event Action             ProcessStarted;
         public event Action             ProcessComplete;
@@ -50,9 +43,32 @@ namespace viewm.Renderer
 
         public event Action<float>      ProgressChanged;
 
+        // -----------------------------------------------------------------------------------------------------------------------
+
+        private readonly string         worldLocation   = "";
+
+        private Blocks                  theBlocks;
+
+        // -----------------------------------------------------------------------------------------------------------------------
+
+        public bool                     DrawHeightmap
+        {
+            get;
+            set;
+        }
+
+        public bool                     DrawBiomes
+        {
+            get;
+            set;
+        }
+
+        // -----------------------------------------------------------------------------------------------------------------------
+
         public                          WorldProcessor  (string worldLocation)
         {
-            this.worldLocation = worldLocation;
+            this.theBlocks      = new Blocks();
+            this.worldLocation  = worldLocation;
         }
 
         public void                     Start           ()
@@ -60,10 +76,8 @@ namespace viewm.Renderer
             if (ProcessStarted != null)
                 ProcessStarted();
 
-            int index = 0;
-            var rendererUtil = new RendererUtil();
-
-            theBlocks = new Blocks(rendererUtil.D2DDeviceContext);
+            int index           = 0;
+            var rendererUtil    = new RendererUtil();
 
             // obtain file list
             var regionList      = Directory.GetFiles(Path.Combine(worldLocation, "region"), "*.mca").ToList();
@@ -87,12 +101,15 @@ namespace viewm.Renderer
 
                         #region Chunk render
 
-                        foreach (var anvilChunk in regionFile.Content.Select(chunk => new Anvil(chunk)))
+                        using (var renderTarget = new BitmapRenderTarget(rendererUtil.D2DDeviceContext, CompatibleRenderTargetOptions.None, new DrawingSizeF(16, 16), new DrawingSize(16, 16), new PixelFormat(Format.R8G8B8A8_UNorm, AlphaMode.Premultiplied)))
                         {
-                            ChunkEntry entry;
-                            RenderSegment(anvilChunk, rendererUtil.D2DDeviceContext, out entry);
-                            
-                            renderedChunks.Add(entry);
+                            foreach (var anvilChunk in regionFile.Content.Select(chunk => new Anvil(chunk)))
+                            {
+                                ChunkEntry entry;
+                                RenderSegment(anvilChunk, renderTarget, out entry);
+
+                                renderedChunks.Add(entry);
+                            }
                         }
 
                         #endregion
@@ -129,11 +146,11 @@ namespace viewm.Renderer
                             // ReSharper restore PossibleNullReferenceException
 
                             regionEntries.Add(new RegionEntry
-                                {
-                                    RenderedRegion = renderTarget.Bitmap,
-                                    XPos = Convert.ToInt32(info[1]),
-                                    ZPos = Convert.ToInt32(info[2])
-                                });
+                            {
+                                RenderedRegion  = renderTarget.Bitmap,
+                                XPos            = Convert.ToInt32(info[1]),
+                                ZPos            = Convert.ToInt32(info[2])
+                            });
 
                             renderTarget.EndDraw();
                         }
@@ -223,6 +240,10 @@ namespace viewm.Renderer
 
             rendererUtil.D2DDeviceContext.EndDraw();
 
+            #endregion
+
+            #region File save
+
             FileStream file = File.OpenWrite(Path.GetFileName(worldLocation) + ".png");
 
             var encoder = new PngBitmapEncoder(rendererUtil.ImagingFactory);
@@ -246,12 +267,12 @@ namespace viewm.Renderer
             frameEncode.Commit();
             encoder.Commit();
 
-            file.Close();
-            file.Dispose();
-
             #endregion
 
             #region Cleanup
+
+            file.Close();
+            file.Dispose();
 
             foreach (RegionEntry bitmap in regionEntries)
             {
@@ -273,64 +294,79 @@ namespace viewm.Renderer
 
         public void                     RenderSegment   (Anvil anvil, RenderTarget renderTarget, out ChunkEntry output)
         {
-            if (heightmapBrush == null)
-                heightmapBrush = new SolidColorBrush(renderTarget, Color.Black);
+            // create char array to hold rendered blocks
+            int[] drawnChunk = new int[16 * 16]; // x * z * 4 where 4 is colors
 
-            var theRectangle = new RectangleF();
-
-            using (var context = new BitmapRenderTarget(renderTarget, CompatibleRenderTargetOptions.None, new DrawingSizeF(16, 16), new DrawingSize(16, 16), new PixelFormat(Format.R8G8B8A8_UNorm, AlphaMode.Premultiplied)))
+            // render code here
+            foreach (AnvilSection section in anvil.Sections)
             {
-                // render code here
-                context.BeginDraw();
-
-                foreach (AnvilSection section in anvil.Sections)
+                // render blocks
+                for (int y = 0; y < 16; y++)
                 {
-                    // render blocks
-                    for (int y = 0; y < 16; y++)
+                    for (int z = 0; z < 16; z++)
                     {
-                        for (int z = 0; z < 16; z++)
+                        for (int x = 0; x < 16; x++)
                         {
-                            for (int x = 0; x < 16; x++)
-                            {
-                                byte blockId = section.Blocks[y * 256 + z * 16 + x];
+                            int     index       = y * 256 + z * 16 + x;
+                            int     dindex      = z *  16 + x;
 
-                                if (blockId == 0 || !theBlocks.BlockList.ContainsKey(blockId))
-                                    continue;
+                            byte    blockId     = section.Blocks[index];
 
-                                // render the fucking thing
-                                theRectangle.Left = x;
-                                theRectangle.Top = z;
+                            if (blockId == 0 || !theBlocks.BlockList.ContainsKey(blockId))
+                                continue;
 
-                                theRectangle.Right = x + BLOCK_SIZE;
-                                theRectangle.Bottom = z + BLOCK_SIZE;
+                            var     blockCol    = theBlocks.BlockList[blockId];
+                            var     finalCol    = new byte[4];
+                            var     prevCol     = BitConverter.GetBytes(drawnChunk[dindex]);
 
-                                context.FillRectangle(theRectangle, theBlocks.BlockList[blockId]);
-                            }
+                            finalCol[0] = processAlpha(blockCol[0], prevCol[0], blockCol[3] / 255.0f);
+                            finalCol[1] = processAlpha(blockCol[1], prevCol[1], blockCol[3] / 255.0f);
+                            finalCol[2] = processAlpha(blockCol[2], prevCol[2], blockCol[3] / 255.0f);
+                            finalCol[3] = 255;
+
+                            drawnChunk[dindex] = BitConverter.ToInt32(finalCol, 0);
                         }
                     }
                 }
-
-                // render heightmap
-                for (int z = 0; z < 16; z++)
-                {
-                    for (int x = 0; x < 16; x++)
-                    {
-                        theRectangle.Left = x;
-                        theRectangle.Top = z;
-
-                        theRectangle.Right = x + BLOCK_SIZE;
-                        theRectangle.Bottom = z + BLOCK_SIZE;
-
-                        heightmapBrush.Opacity = MathUtil.Clamp((((float)anvil.HeightMap[z * 16 + x] - 64) / 256) * 2, 0, 1);
-
-                        context.FillRectangle(theRectangle, heightmapBrush);
-                    }
-                }
-
-                context.EndDraw();
-
-                output = new ChunkEntry { XPos = anvil.XPos, ZPos = anvil.ZPos, RenderedChunk = context.Bitmap };
             }
+
+            // render heightmap
+            for (int z = 0; z < 16; z++)
+            {
+                for (int x = 0; x < 16; x++)
+                {
+                    int dindex      = z * 16 + x;
+
+                    var value       = (byte)MathUtil.Clamp((anvil.HeightMap[z * 16 + x] - 64) * 2, 0, 255);
+                    var finalCol    = new byte[4];
+                    var prevCol     = BitConverter.GetBytes(drawnChunk[dindex]);
+
+                    finalCol[0] = processAlpha(255, prevCol[0], value / 255.0f);
+                    finalCol[1] = processAlpha(255, prevCol[1], value / 255.0f);
+                    finalCol[2] = processAlpha(255, prevCol[2], value / 255.0f);
+                    finalCol[3] = 255;
+
+                    drawnChunk[dindex] = BitConverter.ToInt32(finalCol, 0);
+                }
+            }
+
+            Bitmap newBitmap = new Bitmap(renderTarget, new DrawingSize(16, 16), new BitmapProperties()
+                {
+                    PixelFormat = new PixelFormat(Format.R8G8B8A8_UNorm, AlphaMode.Premultiplied)
+                });
+                   newBitmap.CopyFromMemory(drawnChunk, 16 * 4);
+
+            output = new ChunkEntry
+            {
+                XPos            = anvil.XPos,
+                ZPos            = anvil.ZPos,
+                RenderedChunk   = newBitmap
+            };
+        }
+
+        private byte                    processAlpha    (byte newInput, byte previousInput, float alpha)
+        {
+            return (byte)(newInput * alpha + previousInput * (1 - alpha));
         }
     }
 }

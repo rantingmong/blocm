@@ -45,35 +45,44 @@ namespace viewm
 
                                     var chunkProcessor = new WorldProcessor(directories[index]);
 
-                                    chunkProcessor.ProcessFailed += s => { BeginInvoke(new Action(() => { MessageBox.Show(this, s, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error); })); };
+                                    chunkProcessor.ProcessFailed += s =>
+                                    {
+                                        BeginInvoke(new Action(() =>
+                                        {
+                                            MessageBox.Show(this, s, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                                        }));
+                                    };
 
                                     chunkProcessor.ProcessStarted += () =>
+                                    {
+                                        sTime = DateTime.Now;
+
+                                        BeginInvoke(new Action(() =>
                                         {
-                                            sTime = DateTime.Now;
+                                            progressBar.Value   = 0;
+                                            labelStatus.Text    = "Processing world...";
 
-                                            BeginInvoke(new Action(() =>
-                                                {
-                                                    progressBar.Value = 0;
-                                                    labelStatus.Text = "Processing world...";
-
-                                                    buttonOpen.Enabled = false;
-                                                }));
-                                        };
+                                            buttonOpen.Enabled  = false;
+                                        }));
+                                    };
                                     chunkProcessor.ProcessComplete += () =>
+                                    {
+                                        DateTime eTime = DateTime.Now;
+
+                                        BeginInvoke(new Action(() =>
                                         {
-                                            DateTime eTime = DateTime.Now;
+                                            labelStatus.Text    = "Process completed in " + (eTime - sTime).TotalSeconds + " seconds.";
+                                            buttonOpen.Enabled  = true;
+                                        }));
+                                    };
 
-                                            BeginInvoke(new Action(() =>
-                                                {
-                                                    labelStatus.Text = "Process completed in " + (eTime - sTime).TotalSeconds + " seconds.";
-
-                                                    mapViewer.InputBitmap   = null;
-                                                    buttonOpen.Enabled      = true;
-                                                }));
-                                        };
-
-                                    chunkProcessor.ProgressChanged +=
-                                        (p) => BeginInvoke(new Action(() => { progressBar.Value = (int)(100 * p); }));
+                                    chunkProcessor.ProgressChanged += (p) =>
+                                    {
+                                        BeginInvoke(new Action(() =>
+                                        {
+                                            progressBar.Value = (int)(100 * p);
+                                        }));
+                                    };
 
                                     chunkProcessor.Start();
                                 });
@@ -83,6 +92,11 @@ namespace viewm
 
                     contextMenuOpenWorld.Items.Add(item);
                 }
+
+                contextMenuOpenWorld.Items.Add(new ToolStripSeparator());
+
+                ToolStripMenuItem customDirectory = new ToolStripMenuItem("Custom directory");
+                contextMenuOpenWorld.Items.Add(customDirectory);
             }
             else
             {
